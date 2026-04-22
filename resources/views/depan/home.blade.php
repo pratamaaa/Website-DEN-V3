@@ -76,7 +76,7 @@
                     <div class="col">
                         <h2 class="text-color-dark font-weight-normal text-6 mb-0 pb-1"
                             style="margin-bottom: -15px !important;">
-                            <span class="warna-hijau">Progres Penyusunan</span>
+                            <span class="warna-hijau">Progresaaaaa Penyusunan</span>
                             <strong class="font-weight-extra-bold warna-putih">RUED Provinsi</strong>
                         </h2>
                         <p class="lead text-4 pt-2 font-weight-normal warna-light">
