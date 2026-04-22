@@ -1,0 +1,57 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('gratifikasi_reports', function (Blueprint $table) {
+            $table->id();
+
+            // Identitas
+            $table->string('namalengkap');
+            $table->string('nomorktp')->nullable();
+            $table->string('jabatan')->nullable();
+            $table->string('instansi')->nullable();
+            $table->string('email')->nullable();
+            $table->string('notelpon')->nullable();
+            $table->text('alamat')->nullable();
+
+            // Penerimaan
+            $table->string('jenispenerimaan')->nullable();
+            $table->string('nominal')->nullable();
+            $table->string('eventpenerimaan')->nullable();
+            $table->string('tempat')->nullable();
+            $table->date('tanggal')->nullable();
+            $table->string('file_bukti')->nullable();
+
+            // Pemberi
+            $table->string('nama_pemberi')->nullable();
+            $table->string('pekerjaan_pemberi')->nullable();
+            $table->string('jabatan_pemberi')->nullable();
+            $table->string('email_pemberi')->nullable();
+            $table->string('notelpon_pemberi')->nullable();
+            $table->text('alamat_pemberi')->nullable();
+            $table->string('hubungan_pemberi')->nullable();
+            $table->text('alasan')->nullable();
+            $table->text('kronologi')->nullable();
+            $table->text('catatan_tambahan')->nullable();
+
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('gratifikasi_reports');
+    }
+};

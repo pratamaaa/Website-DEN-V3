@@ -1,0 +1,224 @@
+/* ═══════════════════════════════
+   STRUKTUR ORGANISASI
+═══════════════════════════════ */
+.so-tree {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+}
+
+.so-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.so-level {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    width: 100%;
+}
+
+/* Garis vertikal penghubung */
+.so-connector-v {
+    width: 2px;
+    height: 32px;
+    background-color: #2d8a45;
+    margin: 0 auto;
+}
+
+/* ── Base Card ── */
+.so-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.09);
+    border: 1px solid #e8f5e9;
+    border-top: 4px solid #2d8a45;
+    width: 170px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.so-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.13);
+}
+
+/* ── Foto ── */
+.so-card__photo {
+    width: 100%;
+    background: #f1f8f3;
+    display: flex;
+    justify-content: center;
+    padding: 16px 0 12px;
+}
+
+.so-card__photo img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: top;
+    border: 3px solid #ffffff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    image-rendering: -webkit-optimize-contrast; /* ✅ tambah ini */
+}
+
+/* ── Info (nama & jabatan) ── */
+.so-card__info {
+    width: 100%;
+    padding: 10px 12px 14px;
+    text-align: center;
+    background: #ffffff;
+}
+
+.so-card__jabatan {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #1a5c2a;
+    letter-spacing: 0.3px;
+    line-height: 1.4;
+    margin-bottom: 5px;
+}
+
+.so-card__nama {
+    font-size: 0.75rem;
+    color: #444;
+    line-height: 1.4;
+    font-style: italic;
+}
+
+/* ── Variasi per level ── */
+.so-card--top {
+    width: 210px;
+    border-top-color: #1a5c2a;
+    border-top-width: 5px;
+}
+
+.so-card--top .so-card__photo img {
+    width: 100px;
+    height: 100px;
+    image-rendering: -webkit-optimize-contrast; /* ✅ tambah ini */
+}
+
+.so-card--top .so-card__jabatan {
+    font-size: 0.75rem;
+    color: #1a5c2a;
+}
+
+.so-card--top .so-card__nama {
+    font-size: 0.8rem;
+}
+
+.so-card--level2 {
+    width: 180px;
+    border-top-color: #2d8a45;
+}
+
+.so-card--level3 {
+    width: 155px;
+    border-top-color: #4caf50;
+}
+
+.so-card--level3 .so-card__photo img {
+    width: 66px;
+    height: 66px;
+}
+
+.so-card--level4 {
+    width: 140px;
+    border-top-color: #81c784;
+}
+
+.so-card--level4 .so-card__photo img {
+    width: 58px;
+    height: 58px;
+}
+
+/* ── Update date ── */
+.so-update {
+    text-align: right;
+    margin-top: 48px;
+    font-size: 0.8rem;
+    color: #aaa;
+    font-style: italic;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .so-card        { width: 140px; }
+    .so-card--top   { width: 170px; }
+    .so-card--level2{ width: 150px; }
+    .so-card--level3{ width: 130px; }
+    .so-level       { gap: 10px; }
+}
+
+@media (max-width: 480px) {
+    .so-level       { gap: 8px; }
+    .so-card        { width: 115px; }
+    .so-card--top   { width: 140px; }
+    .so-card__photo img  { width: 60px; height: 60px; }
+    .so-card--top .so-card__photo img { width: 75px; height: 75px; }
+    .so-card__jabatan { font-size: 0.6rem; }
+    .so-card__nama    { font-size: 0.65rem; }
+}
+
+/* Pastikan so-level di dalam so-group tidak collapse */
+.so-group > .so-level {
+    margin-top: 0;
+    justify-content: center;
+}
+
+/* Garis horizontal penghubung antar sibling */
+.so-level {
+    position: relative;
+}
+
+/* Force flex layout untuk struktur organisasi */
+.so-tree,
+.so-tree .so-group,
+.so-tree .so-level {
+    display: flex !important;
+}
+
+.so-tree {
+    flex-direction: column;
+    align-items: center;
+}
+
+.so-tree .so-group {
+    flex-direction: column;
+    align-items: center;
+}
+
+.so-tree .so-level {
+    flex-direction: row !important;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    width: 100%;
+}
+
+/* Biar container tidak membatasi lebar tree */
+#strukturOrganisasi {
+    width: 100%;
+    overflow-x: auto;
+}
+
+#strukturOrganisasi .so-level {
+    min-width: max-content;
+    flex-wrap: nowrap !important; /* cegah wrap ke bawah */
+}
+
+/* Khusus level grandchildren boleh wrap */
+#strukturOrganisasi .so-level .so-level {
+    flex-wrap: wrap !important;
+    min-width: unset;
+}

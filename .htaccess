@@ -1,0 +1,38 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Handle Authorization Header
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    RewriteBase /
+    RewriteRule ^index\.php$ - [L]
+    
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Handle Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+
+    # Block access to .env file
+    <Files .env>
+        Order allow,deny
+        Deny from all
+    </Files>
+
+    # Block access to .git/config
+    RedirectMatch 404 /.git
+
+    # Block access to composer
+    <Files "composer.json">
+    Order Allow,Deny
+    Deny from all
+    </Files>
+
+</IfModule>
