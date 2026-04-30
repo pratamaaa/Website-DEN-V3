@@ -72,52 +72,53 @@ class OrganisasidenController extends Controller
 
     public function save(Request $req){
         $kategori_jabatan = $req->post('kategori_jabatan');
-        $namalengkap = $req->post('namalengkap');
-        $jabatan = $req->post('jabatan');
-        $jabatan_en = $req->post('jabatan_en');
-        $periode = $req->post('periode');
-        $profil = $req->post('profil');
-        $profil_en = $req->post('profil_en');
-        $urutan = $req->post('urutan');
-        $is_active = $req->post('is_active');
+        $namalengkap      = $req->post('namalengkap');
+        $jabatan          = $req->post('jabatan');
+        $jabatan_en       = $req->post('jabatan_en');
+        $periode          = $req->post('periode');
+        $profil           = $req->post('profil');
+        $profil_en        = $req->post('profil_en');
+        $urutan           = $req->post('urutan');
+        $is_active        = $req->post('is_active');
 
         if ($req->hasFile('gambar')){
-            $file = $req->file('gambar');
-            $namafileFull = $file->getClientOriginalName();
-            $namafileOri = pathinfo($namafileFull, PATHINFO_FILENAME);
-            $ekstensi = $file->getClientOriginalExtension();
-            $namagambar = $namafileOri.'_'.time().'.'.$ekstensi;
+            $file        = $req->file('gambar');
+            $namafileOri = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $ekstensi    = $file->getClientOriginalExtension();
+            $namagambar  = $namafileOri . '_' . time() . '.' . $ekstensi;
 
-            $file->move("public/uploads/profilden", "{$namagambar}");
+            // ✅ public_path() langsung nunjuk ke folder /public, tidak ada double public
+            $file->move(public_path('uploads/profilden'), $namagambar);
         }else{
             $namagambar = '';
         }
         
-        $data = ['kategori_jabatan' => $kategori_jabatan, 
-                 'namalengkap' => $namalengkap,
-                 'jabatan' => $jabatan,
-                 'jabatan_en' => $jabatan_en,
-                 'periode' => $periode,
-                 'foto' => $namagambar,
-                 'profil' => $profil,
-                 'profil_en' => $profil_en,
-                 'urutan' => $urutan,
-                 'is_active' => $is_active,
-                 'created_at' => date('Y-m-d H:i:s'),
-                ];
+        $data = [
+            'kategori_jabatan' => $kategori_jabatan, 
+            'namalengkap'      => $namalengkap,
+            'jabatan'          => $jabatan,
+            'jabatan_en'       => $jabatan_en,
+            'periode'          => $periode,
+            'foto'             => $namagambar,
+            'profil'           => $profil,
+            'profil_en'        => $profil_en,
+            'urutan'           => $urutan,
+            'is_active'        => $is_active,
+            'created_at'       => date('Y-m-d H:i:s'),
+        ];
         
         try{
             $simpan = DB::table('organisasi_den')->insert($data);
 
             if ($simpan){
-                $response = ['result'=>'success', 'message'=>'Save successfully'];
+                $response = ['result' => 'success', 'message' => 'Save successfully'];
             }else{
-                $response = ['result'=>'failed', 'message'=>'Save failed'];
+                $response = ['result' => 'failed', 'message' => 'Save failed'];
             }
         }catch(\Illuminate\Database\QueryException $e){
             $errorCode = $e->errorInfo[1];
             if ($errorCode == 1062){
-                $response = ['result'=>'failed', 'message'=>'Duplicate key found.']; 
+                $response = ['result' => 'failed', 'message' => 'Duplicate key found.']; 
             }
         }
 
@@ -128,9 +129,8 @@ class OrganisasidenController extends Controller
         $id = $req->get('id');
 
         $data['judulmodal'] = 'Edit Organisasi DEN';
-        $data['kategori'] = DB::table('organisasiden_kategori')->orderBy('id_kategori_organisasiden', 'asc');
-        $data['data'] = DB::table('organisasi_den')
-                        ->where('id_organisasiden', $id)->first();
+        $data['kategori']   = DB::table('organisasiden_kategori')->orderBy('id_kategori_organisasiden', 'asc');
+        $data['data']       = DB::table('organisasi_den')->where('id_organisasiden', $id)->first();
 
         return view('dapur.organisasiden.edit', $data);
     }
@@ -138,53 +138,53 @@ class OrganisasidenController extends Controller
     public function saveupdate(Request $req){
         $id_organisasiden = $req->post('id_organisasiden');
         $kategori_jabatan = $req->post('kategori_jabatan');
-        $namalengkap = $req->post('namalengkap');
-        $jabatan = $req->post('jabatan');
-        $jabatan_en = $req->post('jabatan_en');
-        $periode = $req->post('periode');
-        $profil = $req->post('profil');
-        $profil_en = $req->post('profil_en');
-        $urutan = $req->post('urutan');
-        $is_active = $req->post('is_active');
+        $namalengkap      = $req->post('namalengkap');
+        $jabatan          = $req->post('jabatan');
+        $jabatan_en       = $req->post('jabatan_en');
+        $periode          = $req->post('periode');
+        $profil           = $req->post('profil');
+        $profil_en        = $req->post('profil_en');
+        $urutan           = $req->post('urutan');
+        $is_active        = $req->post('is_active');
 
         if ($req->hasFile('gambar')){
-            $file = $req->file('gambar');
-            $namafileFull = $file->getClientOriginalName();
-            $namafileOri = pathinfo($namafileFull, PATHINFO_FILENAME);
-            $ekstensi = $file->getClientOriginalExtension();
-            $namagambar = $namafileOri.'_'.time().'.'.$ekstensi;
+            $file        = $req->file('gambar');
+            $namafileOri = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $ekstensi    = $file->getClientOriginalExtension();
+            $namagambar  = $namafileOri . '_' . time() . '.' . $ekstensi;
 
-            $file->move("public/uploads/profilden", "{$namagambar}");
+            // ✅ public_path() langsung nunjuk ke folder /public, tidak ada double public
+            $file->move(public_path('uploads/profilden'), $namagambar);
         }else{
             $namagambar = $req->post('gambar_current');
         }
         
-        $data = ['kategori_jabatan' => $kategori_jabatan, 
-                 'namalengkap' => $namalengkap,
-                 'jabatan' => $jabatan,
-                 'jabatan_en' => $jabatan_en,
-                 'periode' => $periode,
-                 'foto' => $namagambar,
-                 'profil' => $profil,
-                 'profil_en' => $profil_en,
-                 'urutan' => $urutan,
-                 'is_active' => $is_active,
-                 'updated_at' => date('Y-m-d H:i:s'),
-                ];
+        $data = [
+            'kategori_jabatan' => $kategori_jabatan, 
+            'namalengkap'      => $namalengkap,
+            'jabatan'          => $jabatan,
+            'jabatan_en'       => $jabatan_en,
+            'periode'          => $periode,
+            'foto'             => $namagambar,
+            'profil'           => $profil,
+            'profil_en'        => $profil_en,
+            'urutan'           => $urutan,
+            'is_active'        => $is_active,
+            'updated_at'       => date('Y-m-d H:i:s'),
+        ];
         
         try{
-            // $simpan = DB::table('organisasi_den')->insert($data);
             $simpan = DB::table('organisasi_den')->where('id_organisasiden', $id_organisasiden)->update($data);
 
             if ($simpan){
-                $response = ['result'=>'success', 'message'=>'Save successfully'];
+                $response = ['result' => 'success', 'message' => 'Save successfully'];
             }else{
-                $response = ['result'=>'failed', 'message'=>'Save failed'];
+                $response = ['result' => 'failed', 'message' => 'Save failed'];
             }
         }catch(\Illuminate\Database\QueryException $e){
             $errorCode = $e->errorInfo[1];
             if ($errorCode == 1062){
-                $response = ['result'=>'failed', 'message'=>'Duplicate key found.']; 
+                $response = ['result' => 'failed', 'message' => 'Duplicate key found.']; 
             }
         }
 
@@ -193,26 +193,13 @@ class OrganisasidenController extends Controller
 
     public function delete(Request $req){
         $id = $req->post('id');
-        
-        // $data = DB::table('organisasi_den')->where('id_organisasiden', $id);
-        // if ($data->count() != 0 ){
-        //     $namagambar = $data->first()->foto;
-        //     if (File::exists("public/uploads/publikasi-image/".$namagambar) == true){
-        //         File::delete("public/uploads/publikasi-image/".$namagambar);
-        //     }
-
-        //     $namaberkas = $data->first()->berkas;
-        //     if (File::exists("public/uploads/publikasi/".$namaberkas) == true){
-        //         File::delete("public/uploads/publikasi/".$namaberkas);
-        //     }
-        // }
 
         $hapus = DB::table('organisasi_den')->where('id_organisasiden', $id)->delete();
 
         if ($hapus){
-            $response = ['result'=>'success', 'message'=>'Deleting data successfully'];
+            $response = ['result' => 'success', 'message' => 'Deleting data successfully'];
         }else{
-            $response = ['result'=>'failed', 'message'=>'Deleteting data failed'];
+            $response = ['result' => 'failed', 'message' => 'Deleteting data failed'];
         }
 
         return response()->json($response);

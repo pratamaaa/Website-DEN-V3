@@ -6,8 +6,10 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
+use App\Models\User;
 
 class LoginController extends Controller
 {
@@ -35,95 +37,93 @@ class LoginController extends Controller
         $captcha = Http::asForm()->post(
             'https://www.google.com/recaptcha/api/siteverify',
             [
-                'secret' => config('services.recaptcha.secret_key'),
+                'secret'   => config('services.recaptcha.secret_key'),
                 'response' => $request->input('g-recaptcha-response'),
                 'remoteip' => $request->ip(),
             ]
         );
 
-        if (! $captcha->json('success')) {
+        if (!$captcha->json('success')) {
             return back()
                 ->withErrors(['g-recaptcha-response' => 'Verifikasi captcha gagal'])
                 ->withInput($request->except('password'));
         }
 
         // =========================
-        // LOGIN ATTEMPT
+        // CARI USER BY USERNAME ATAU EMAIL
         // =========================
-        if (! Auth::attempt($request->only('username', 'password'))) {
+        $user = User::where('username', $request->username)
+                    ->orWhere('email', $request->username)
+                    ->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
 
             // LOG LOGIN GAGAL
             DB::table('audit_logs')->insert([
-                'user_id' => null,
-                'activity' => 'LOGIN_FAILED',
-                'module' => 'auth',
+                'user_id'    => null,
+                'activity'   => 'LOGIN_FAILED',
+                'module'     => 'auth',
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->userAgent(),
                 'created_at' => now(),
             ]);
 
             return back()->withErrors([
-                'username' => 'Username atau password salah',
+                'username' => 'Username/email atau password salah',
             ])->withInput($request->except('password'));
         }
 
-        // Regenerate session (standard Laravel)
+        // Login user
+        Auth::login($user);
+
+        // Regenerate session
         $request->session()->regenerate();
 
         // Reset MFA status tiap login
         session(['mfa_verified' => false]);
 
-        $user = Auth::user();
-
         // =========================
-        // 🔒 CEK PASSWORD EXPIRED (SEBELUM MFA)
+        // CEK PASSWORD EXPIRED (SEBELUM MFA)
         // =========================
         if ($user->password_changed_at) {
 
-            $expiredDays = 1;
+            $expiredDays = 90;
 
             if (Carbon::parse($user->password_changed_at)->addDays($expiredDays)->isPast()) {
 
                 Auth::logout();
-
                 $request->session()->regenerate();
 
-                session([
-                    'force_password_reset_user' => $user->id,
-                ]);
+                session(['force_password_reset_user' => $user->id]);
 
                 return redirect('/force-change-password');
             }
 
         } else {
-            // belum pernah set password
+            // Belum pernah set password
             Auth::logout();
+            $request->session()->regenerate();
 
-            $request->session()->regenerate(); // pindahin ke atas
-
-            session([
-                'force_password_reset_user' => $user->id,
-            ]);
-
-            $request->session()->regenerate(); // ini aman
+            session(['force_password_reset_user' => $user->id]);
 
             return redirect('/force-change-password')
                 ->with('warning', 'Silakan set password Anda.');
         }
 
         // =========================
-        // AUDIT LOG LOGIN
+        // AUDIT LOG LOGIN BERHASIL
         // =========================
         DB::table('audit_logs')->insert([
-            'user_id' => $user->id,
-            'activity' => 'LOGIN',
-            'module' => 'auth',
+            'user_id'    => $user->id,
+            'activity'   => 'LOGIN',
+            'module'     => 'auth',
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
             'created_at' => now(),
         ]);
+
         // =========================
-        // AMBIL DATA Auth::logout();ROLE
+        // AMBIL DATA ROLE
         // =========================
         $pengguna = DB::table('users as us')
             ->join('users_level as lv', 'us.id_user_level', '=', 'lv.id_user_level')
@@ -131,20 +131,13 @@ class LoginController extends Controller
             ->select('us.name', 'lv.level', 'lv.keterangan')
             ->first();
 
-        if (! $pengguna) {
+        if (!$pengguna) {
             Auth::logout();
-
-            session([
-                'force_password_reset_user' => $user->id,
-            ]);
-
             $request->session()->regenerate();
 
-            return redirect()
-                ->route('login')
-                ->withErrors([
-                    'username' => 'User tidak ditemukan atau tidak memiliki akses',
-                ]);
+            return redirect()->route('login')->withErrors([
+                'username' => 'User tidak ditemukan atau tidak memiliki akses',
+            ]);
         }
 
         // Simpan info user ke session
@@ -153,7 +146,7 @@ class LoginController extends Controller
         Session::put('sesLeveldesc', $pengguna->keterangan);
 
         // =========================
-        // 🔥 SEMUA ROLE WAJIB MFA
+        // SEMUA ROLE WAJIB MFA
         // =========================
         return redirect()->route('mfa.verify');
     }

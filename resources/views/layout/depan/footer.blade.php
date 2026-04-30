@@ -4,59 +4,135 @@
     @endphp
 
     <style>
-        .app-version {
-            font-size: 12px;
-            color: #9aa0a6;
-            line-height: 1.6;
+        .footer-modern {
+            background: #111820;
+            color: #fff;
+            padding: 50px 0 20px;
         }
 
-        .social-icons li {
-            background: #e9ecef;
-            border-radius: 6px;
-            width: 32px;
-            height: 32px;
+        .footer-modern h5 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .footer-modern p,
+        .footer-modern a {
+            font-size: 14px;
+            color: rgba(255,255,255,0.75);
+            line-height: 1.8;
+            text-decoration: none;
+        }
+
+        .footer-modern a:hover {
+            color: #28a745;
+        }
+
+        .footer-logo {
+    text-align: center;
+}
+
+.footer-logo img {
+    width: 130px;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+        .footer-org-name {
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 10px;
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+        }
+
+        .footer-social li {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: 0.3s;
         }
 
-        .social-icons li a {
-            color: #555;
+        .footer-social li:hover {
+            background: #28a745;
+        }
+
+        .footer-social li a {
+            color: #fff;
+        }
+
+        .footer-divider {
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-bottom {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        @media(max-width:768px){
+            .footer-divider{
+                border-right:none;
+            }
         }
     </style>
 
-    <div class="footer-copyright__ footer-copyright-style-2">
-        <div class="container py-3">
+    <div class="footer-modern">
+        <div class="container">
+            <div class="row gy-4">
 
-            <div class="row align-items-center">
+                {{-- Logo --}}
+                <div class="col-lg-3 footer-divider">
+                    <div class="footer-logo">
+                        <img src="{{ asset('theme/img/logo/den.png') }}" alt="Logo DEN">
+                    </div>
+                </div>
 
-                <div class="col-md-8 mb-3 mb-md-0">
+                {{-- Alamat --}}
+                <div class="col-lg-3 footer-divider">
+                    <h5>Alamat</h5>
+                    <p>{!! $idorg->alamat !!}</p>
+                </div>
 
-                    <p class="warna-hijau fontsize-14 mb-1">
-                        © {{ date('Y') }} {{ $idorg->nama_organisasi }}
-                    </p>
+                {{-- Kontak --}}
+                <div class="col-lg-3 footer-divider">
+                    <h5>Kontak</h5>
+                    <p>
+                        Telepon: {{ $idorg->telpon }} <br>
 
-                    <p class="warna-gray1 fontsize-12 mb-2 lineheight-17">
-
-                        {!! $idorg->alamat !!}<br>
-
-                        Telepon: {{ $idorg->telpon }}
                         @if ($idorg->fax)
-                            | Fax: {{ $idorg->fax }}
+                            Fax: {{ $idorg->fax }} <br>
                         @endif
-                        <br>
 
                         Email:
                         <a href="mailto:{{ $idorg->email }}">
                             {{ $idorg->email }}
                         </a>
-
                     </p>
+                </div>
 
-                    <ul class="header-social-icons social-icons social-icons-clean d-flex gap-2">
+                {{-- Media Sosial --}}
+                <div class="col-lg-3">
+                    <h5>Media Sosial</h5>
 
+                    <ul class="footer-social">
                         @if ($idorg->facebook)
-                            <li class="social-icons-facebook">
+                            <li>
                                 <a href="{{ $idorg->facebook }}" target="_blank">
                                     <i class="fab fa-facebook-f"></i>
                                 </a>
@@ -64,7 +140,7 @@
                         @endif
 
                         @if ($idorg->instagram)
-                            <li class="social-icons-instagram">
+                            <li>
                                 <a href="{{ $idorg->instagram }}" target="_blank">
                                     <i class="fab fa-instagram"></i>
                                 </a>
@@ -72,30 +148,22 @@
                         @endif
 
                         @if ($idorg->youtube)
-                            <li class="social-icons-youtube">
+                            <li>
                                 <a href="{{ $idorg->youtube }}" target="_blank">
                                     <i class="fab fa-youtube"></i>
                                 </a>
                             </li>
                         @endif
-
                     </ul>
-
-                </div>
-
-
-                <div class="col-md-4 text-md-end text-start">
-
-                    <div class="app-version">
-                        Sistem Informasi DEN<br>
-                        Version <strong>{{ config('app.version', '3.1.1') }}</strong>
-                    </div>
-
                 </div>
 
             </div>
 
+            {{-- Bottom --}}
+            <div class="footer-bottom">
+                © {{ date('Y') }} {{ $idorg->nama_organisasi }} <br>
+                Version <strong>{{ config('app.version', '3.1.1') }}</strong>
+            </div>
         </div>
     </div>
-
 </footer>

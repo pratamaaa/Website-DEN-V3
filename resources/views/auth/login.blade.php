@@ -30,7 +30,6 @@
         /* LEFT SIDE */
 
         .login-left {
-
             flex: 1;
             background: url('{{ asset('login/images/bgweb.png') }}') center/cover no-repeat;
             position: relative;
@@ -45,7 +44,6 @@
             position: absolute;
             inset: 0;
             background: rgba(0, 0, 0, 0.35);
-            /* backdrop-filter: blur(0px); */
         }
 
         .left-content {
@@ -70,7 +68,6 @@
         /* RIGHT SIDE */
 
         .login-right {
-
             width: 420px;
             background: #f8f9fa;
             display: flex;
@@ -80,7 +77,6 @@
         }
 
         .login-card {
-
             width: 100%;
             background: white;
             padding: 35px;
@@ -109,7 +105,6 @@
         }
 
         .form-control {
-
             width: 100%;
             height: 48px;
             border-radius: 8px;
@@ -120,11 +115,9 @@
         }
 
         .form-control:focus {
-
             outline: none;
             border-color: #009933;
             box-shadow: 0 0 0 3px rgba(0, 153, 51, .15);
-
         }
 
         .form-control::placeholder {
@@ -132,19 +125,16 @@
         }
 
         .toggle-password {
-
             position: absolute;
             right: 14px;
             top: 14px;
             cursor: pointer;
             color: #777;
-
         }
 
-        /* BUTTON */
+        /* BUTTON LOGIN */
 
         .btn-login {
-
             width: 100%;
             height: 48px;
             border: none;
@@ -154,25 +144,72 @@
             font-weight: 600;
             cursor: pointer;
             transition: .2s;
-
         }
 
         .btn-login:hover {
-
             transform: translateY(-1px);
             box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+        }
 
+        /* DIVIDER */
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 18px 0;
+            color: #aaa;
+            font-size: 13px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e0e0e0;
+        }
+
+        /* BUTTON SSO */
+
+        .btn-sso {
+            width: 100%;
+            height: 48px;
+            border: none;
+            border-radius: 8px;
+            background: #fcc600;
+            color: #333;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: .2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .btn-sso:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(252, 198, 0, 0.4);
+            background: #e6b400;
+            color: #333;
+        }
+
+        .btn-sso img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
         }
 
         /* ERROR */
 
         .invalid-feedback {
-
             font-size: 13px;
             color: #e74c3c;
             text-align: left;
             margin-top: 5px;
-
         }
 
         .app-version {
@@ -222,13 +259,7 @@
     <!-- LEFT PANEL -->
 
     <div class="login-left">
-
-        <div class="left-content">
-
-
-
-        </div>
-
+        <div class="left-content"></div>
     </div>
 
     <!-- RIGHT PANEL -->
@@ -304,16 +335,32 @@
                 @enderror
 
 
-                <!-- BUTTON -->
+                <!-- BUTTON LOGIN -->
                 <button class="btn-login">
                     LOGIN
                 </button>
 
-                <div class="app-version">
-                    Version 3.1.1
-                </div>
-
             </form>
+
+
+            <!-- DIVIDER -->
+            <div class="divider">atau</div>
+
+            
+            <!-- BUTTON SSO -->
+            <a href="#" 
+   style="width:100%; height:48px; background:#fcc600; color:#333; display:flex; align-items:center; justify-content:center; border-radius:8px; font-weight:700; text-decoration:none; gap:10px; margin-top:5px;">
+    <div style="width:18px; height:18px; overflow:hidden; flex-shrink:0;">
+        <img src="{{ asset('theme/img/logo/logo-esdm.png') }}" alt="ESDM" 
+             style="width:100%; height:100%; object-fit:contain;">
+    </div>
+    Single Sign-On ESDM
+</a>
+
+
+            <div class="app-version">
+                Version 3.1.1
+            </div>
 
         </div>
 
