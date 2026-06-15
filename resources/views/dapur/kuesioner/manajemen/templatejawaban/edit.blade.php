@@ -78,11 +78,12 @@
                                             <td class="col-icon" style="display: none;">
                                                 {{-- PREVIEW ICON LAMA --}}
                                                 @if(!empty($row->kuesioner_template_jawaban_icon))
-                                                    <div class="mb-2 text-center">
-                                                        <img src="{{ asset('survey/'.$row->kuesioner_template_jawaban_icon) }}" style="height: 30px; object-fit: contain;">
-                                                        <br><small class="text-muted">File saat ini</small>
-                                                    </div>
-                                                @endif
+    <div class="mb-2 text-center">
+        <img src="{{ asset('assets_survey/'.$row->kuesioner_template_jawaban_icon) }}"
+             style="height: 30px; object-fit: contain;">
+        <br><small class="text-muted">File saat ini</small>
+    </div>
+@endif
                                                 
                                                 {{-- HIDDEN INPUT NAMA FILE LAMA --}}
                                                 <input type="hidden" name="jawaban[{{$key}}][old_icon]" value="{{ $row->kuesioner_template_jawaban_icon }}">

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminMfaController;
+use App\Http\Controllers\Auth\SsoController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MfaController;
 use App\Http\Controllers\MfaLoginController;
@@ -8,6 +9,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/kelola', [LoginController::class, 'index'])->name('login');
 Route::post('/loginprocess', [LoginController::class, 'authenticate']);
+
+// SSO Routes
+Route::get('/login/sso', [SsoController::class, 'login'])->name('login.sso');
+Route::get('/logout/sso', [SsoController::class, 'logout'])->name('logout.sso');
 
 Route::middleware('auth')->group(function () {
 

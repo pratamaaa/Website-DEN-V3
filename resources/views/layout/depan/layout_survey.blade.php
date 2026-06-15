@@ -13,9 +13,9 @@
 		<meta name="author" content="">
 
 		<!-- Favicon -->
-		<link rel="shortcut icon" href="{{ asset('theme/img/logo/favicon.png') }}" type="image/x-icon" />
-		<link rel="apple-touch-icon" href="{{ asset('theme/img/logo/favicon.png') }}">
-
+		{{-- <link rel="shortcut icon" href="{{ asset('theme/img/logo/favicon.png') }}" type="image/x-icon" /> --}}
+		{{-- <link rel="apple-touch-icon" href="{{ asset('theme/img/logo/favicon.png') }}"> --}}
+<link rel="shortcut icon" href="{{ asset('theme/img/logo/den.png') }}" />
 		<!-- Mobile Metas -->
 		<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, shrink-to-fit=no">
 

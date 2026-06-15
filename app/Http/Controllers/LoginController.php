@@ -57,21 +57,29 @@ class LoginController extends Controller
                     ->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
+    // LOG LOGIN GAGAL
+    DB::table('audit_logs')->insert([
+        'user_id'    => null,
+        'activity'   => 'LOGIN_FAILED',
+        'module'     => 'auth',
+        'ip_address' => $request->ip(),
+        'user_agent' => $request->userAgent(),
+        'created_at' => now(),
+    ]);
 
-            // LOG LOGIN GAGAL
-            DB::table('audit_logs')->insert([
-                'user_id'    => null,
-                'activity'   => 'LOGIN_FAILED',
-                'module'     => 'auth',
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-                'created_at' => now(),
-            ]);
+    return back()->withErrors([
+        'username' => 'Username/email atau password salah',
+    ])->withInput($request->except('password'));
+}
 
-            return back()->withErrors([
-                'username' => 'Username/email atau password salah',
-            ])->withInput($request->except('password'));
-        }
+// =========================
+// CEK IS_ACTIVE
+// =========================
+if (!$user->is_active) {
+    return back()->withErrors([
+        'username' => 'Akun Anda tidak aktif. Hubungi administrator.',
+    ])->withInput($request->except('password'));
+}
 
         // Login user
         Auth::login($user);
@@ -83,32 +91,33 @@ class LoginController extends Controller
         session(['mfa_verified' => false]);
 
         // =========================
-        // CEK PASSWORD EXPIRED (SEBELUM MFA)
-        // =========================
-        if ($user->password_changed_at) {
+// CEK PASSWORD EXPIRED (SKIP UNTUK USER SSO)
+// =========================
+if (!$user->nip) {
+    if ($user->password_changed_at) {
 
-            $expiredDays = 90;
+        $expiredDays = 90;
 
-            if (Carbon::parse($user->password_changed_at)->addDays($expiredDays)->isPast()) {
+        if (Carbon::parse($user->password_changed_at)->addDays($expiredDays)->isPast()) {
 
-                Auth::logout();
-                $request->session()->regenerate();
-
-                session(['force_password_reset_user' => $user->id]);
-
-                return redirect('/force-change-password');
-            }
-
-        } else {
-            // Belum pernah set password
             Auth::logout();
             $request->session()->regenerate();
 
             session(['force_password_reset_user' => $user->id]);
 
-            return redirect('/force-change-password')
-                ->with('warning', 'Silakan set password Anda.');
+            return redirect('/force-change-password');
         }
+
+    } else {
+        Auth::logout();
+        $request->session()->regenerate();
+
+        session(['force_password_reset_user' => $user->id]);
+
+        return redirect('/force-change-password')
+            ->with('warning', 'Silakan set password Anda.');
+    }
+}
 
         // =========================
         // AUDIT LOG LOGIN BERHASIL

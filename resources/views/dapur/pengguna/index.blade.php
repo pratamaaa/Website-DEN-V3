@@ -1,11 +1,17 @@
 @extends('layout.dapur.app')
 
 @section('content')
+
 <style>
     .table th{text-align: center;}
     .table td, .table th {padding: 7px 7px;}
     .ratakanan{text-align: right;}
     .ratatengah{text-align: center !important;}
+    #tabelku td:nth-child(6),
+    #tabelku td:nth-child(7) {
+        text-align: center !important;
+        vertical-align: middle;
+    }
 </style>
 
 <section class="pcoded-main-container">
@@ -32,15 +38,17 @@
                         <div class="dt-responsive table-responsive">
                             <table id="tabelku" class="table table-striped table-bordered table-hover nowrap2" width="100%">
                                 <thead>
-                                    <tr>
-                                        <th width="5%">No</th>
-                                        <th width="30%">Username</th>
-                                        <th width="25%">Nama Lengkap</th>
-                                        <th width="15%">Email</th>
-                                        <th width="15%">Level Pengguna</th>
-                                        <th width="10%">Aksi</th>
-                                    </tr>
-                                </thead>
+    <tr>
+        <th width="5%">No</th>
+        <th width="25%">Username</th>
+        <th width="20%">Nama Lengkap</th>
+        <th width="15%">Email</th>
+        <th width="12%">Level Pengguna</th>
+        <th width="8%">Tipe</th>
+        <th width="8%">Status</th>
+        <th width="7%">Aksi</th>
+    </tr>
+</thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -75,17 +83,25 @@
             serverSide: true,
             ajax: "{{ url('/dap/pengguna/getlist') }}",
             columns: [
-                {data: 'DT_RowIndex', name: 'DT_RowIndex'},
-                {data: 'uname', name: 'uname'},
-                {data: 'nama', name: 'nama'},
-                {data: 'mail', name: 'mail'},
-                {data: 'ulevel', name: 'ulevel'},
-                {data: 'action'}
-            ],
-            columnDefs: [
-                { className: "ratatengah", "targets": [5]},
-                { className: "ndrparagraf", "targets": "_all"},
-            ],
+    {data: 'DT_RowIndex', name: 'DT_RowIndex'},
+    {data: 'uname', name: 'uname'},
+    {data: 'nama', name: 'nama'},
+    {data: 'mail', name: 'mail'},
+    {data: 'ulevel', name: 'ulevel'},
+    {data: 'tipe', name: 'tipe'},
+    {data: 'status', name: 'status'},
+    {data: 'action'}
+],
+columnDefs: [
+    { className: "ratatengah", "targets": [5, 6, 7]},
+    { className: "ndrparagraf", "targets": "_all"},
+],
+createdRow: function(row, data, dataIndex) {
+    $('td:eq(5), td:eq(6)', row).css({
+        'text-align': 'center',
+        'vertical-align': 'middle'
+    });
+},
         });
     });
 

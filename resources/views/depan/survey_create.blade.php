@@ -295,7 +295,10 @@
                                           @if ($p->kuesioner_pertanyaan_is_icon == 1)
                                              {{-- Tampilan ICON --}}
                                              <span class="option-icon-container">
-                                                <img src="{{ asset($j->kuesioner_jawaban_icon) }}" alt="{{ $j->kuesioner_jawaban_nama }}">
+                                               @if(!empty($j->kuesioner_jawaban_icon))
+    <img src="{{ asset('assets_survey/'.$j->kuesioner_jawaban_icon) }}"
+         alt="{{ $j->kuesioner_jawaban_nama }}">
+@endif
                                              </span>
                                           @else
                                              {{-- Tampilan NUMBER --}}

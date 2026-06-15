@@ -5,8 +5,9 @@
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Survey Kepuasan Masyarakat - Dewan Energi Nasional</title>
-   <link rel="shortcut icon" href="{{ asset('theme/img/logo/favicon.png') }}" type="image/x-icon" />
-   <link rel="apple-touch-icon" href="{{ asset('theme/img/logo/favicon.png') }}">
+   {{-- <link rel="shortcut icon" href="{{ asset('theme/img/logo/favicon.png') }}" type="image/x-icon" /> --}}
+   <link rel="shortcut icon" href="{{ asset('theme/img/logo/den.png') }}" />
+   {{-- <link rel="apple-touch-icon" href="{{ asset('theme/img/logo/favicon.png') }}"> --}}
    <style>
       /* Reset CSS dasar */
       * {

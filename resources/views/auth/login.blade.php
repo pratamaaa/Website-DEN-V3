@@ -7,8 +7,7 @@
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <link rel="shortcut icon" href="{{ asset('theme/img/logo/favicon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('theme/img/logo/den.png') }}" />
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -348,7 +347,8 @@
 
             
             <!-- BUTTON SSO -->
-            <a href="#" 
+            <!-- BUTTON SSO -->
+<a href="{{ route('login.sso') }}" 
    style="width:100%; height:48px; background:#fcc600; color:#333; display:flex; align-items:center; justify-content:center; border-radius:8px; font-weight:700; text-decoration:none; gap:10px; margin-top:5px;">
     <div style="width:18px; height:18px; overflow:hidden; flex-shrink:0;">
         <img src="{{ asset('theme/img/logo/logo-esdm.png') }}" alt="ESDM" 

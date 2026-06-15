@@ -21,35 +21,49 @@ class PenggunaController extends Controller
 
     public function getList()
     {
-        $data = DB::table('users as us')->join('users_level as lv', 'us.id_user_level', '=', 'lv.id_user_level')
-            ->orderBy('username', 'asc')->get();
+        $data = DB::table('users as us')
+    ->join('users_level as lv', 'us.id_user_level', '=', 'lv.id_user_level')
+    ->orderBy('username', 'asc')
+    ->get();
 
-        $datatable = DataTables::of($data)
-            ->addIndexColumn()
-            ->addColumn('uname', function ($row) {
-                return '<p class="ndrparagraf">'.$row->username.'</p>';
-            })
-            ->addColumn('nama', function ($row) {
-                return '<p class="ndrparagraf">'.$row->name.'</p>';
-            })
-            ->addColumn('mail', function ($row) {
-                return '<p class="ndrparagraf">'.$row->email.'</p>';
-            })
-            ->addColumn('ulevel', function ($row) {
-                return '<p class="ndrparagraf">'.$row->level.'</p>';
-            })
-            ->addColumn('action', function ($row) {
-                $actionBtn = '<button type="button" onclick="showFormedit(\''.$row->id.'\')" title="Edit" class="btn btn-sm waves-effect waves-light btn-info m-b-0 " style="padding-bottom: 0px;padding-top:0px;">
-                                <i class="feather icon-edit-2"></i>
-                            </button>
-                            <button type="button" onclick="hapus(\''.$row->id.'\')" title="Hapus" class="btn btn-sm waves-effect waves-light btn-danger m-b-0 " style="padding-bottom: 0px;padding-top:0px;">
-                                <i class="feather icon-trash-2"></i>
-                            </button>';
-
-                return $actionBtn;
-            })
-            ->rawColumns(['uname', 'nama', 'mail', 'ulevel', 'action'])
-            ->make(true);
+$datatable = DataTables::of($data)
+    ->addIndexColumn()
+    ->addColumn('uname', function ($row) {
+        return '<p class="ndrparagraf">'.$row->username.'</p>';
+    })
+    ->addColumn('nama', function ($row) {
+        return '<p class="ndrparagraf">'.$row->name.'</p>';
+    })
+    ->addColumn('mail', function ($row) {
+        return '<p class="ndrparagraf">'.$row->email.'</p>';
+    })
+    ->addColumn('ulevel', function ($row) {
+        return '<p class="ndrparagraf">'.$row->level.'</p>';
+    })
+    ->addColumn('tipe', function ($row) {
+        if ($row->nip) {
+            return '<span class="badge badge-warning text-dark"><i class="feather i
+            n-shield"></i>SSO</span>';
+        }
+        return '<span class="badge badge-secondary"><i class="feather icon-user"></i>Manual</span>';
+    })
+    ->addColumn('status', function ($row) {
+        if ($row->is_active) {
+            return '<span class="badge badge-success">Aktif</span>';
+        }
+        return '<span class="badge badge-danger">Nonaktif</span>';
+    })
+    ->addColumn('action', function ($row) {
+        $actionBtn = '<button type="button" onclick="showFormedit(\''.$row->id.'\')" title="Edit" class="btn btn-sm waves-effect waves-light btn-info m-b-0" style="padding-bottom:0px;padding-top:0px;">
+                        <i class="feather icon-edit-2"></i>
+                    </button>
+                    <button type="button" onclick="hapus(\''.$row->id.'\')" title="Hapus" class="btn btn-sm waves-effect waves-light btn-danger m-b-0" style="padding-bottom:0px;padding-top:0px;">
+                        <i class="feather icon-trash-2"></i>
+                    </button>';
+        return $actionBtn;
+    })
+    ->rawColumns(['uname', 'nama', 'mail', 'ulevel', 'tipe', 'status', 'action'])
+    ->make(true);
 
         return $datatable;
     }
@@ -98,69 +112,81 @@ class PenggunaController extends Controller
     }
 
     public function edit(Request $req)
-    {
-        $id = $req->get('id');
+{
+    $id = $req->get('id');
 
-        $data['judulmodal'] = 'Edit Pengguna';
-        $data['kategori'] = DB::table('users_level')->orderBy('id_user_level', 'asc');
-        $data['data'] = DB::table('users')->where('id', $id)->first();
+    $data['judulmodal'] = 'Edit Pengguna';
+    $data['kategori'] = DB::table('users_level')->orderBy('id_user_level', 'asc');
+    $data['data'] = \App\Models\User::findOrFail($id); // ganti ke Eloquent
 
-        return view('dapur.pengguna.edit', $data);
-    }
+    return view('dapur.pengguna.edit', $data);
+}
 
     public function saveupdate(Request $req)
-    {
+{
+    $user = \App\Models\User::findOrFail($req->id_pengguna);
+    $isSso = !empty($user->nip);
 
+    // Rules berbeda untuk SSO vs manual
+    if ($isSso) {
         $rules = [
-            'username' => 'required|string|max:50|unique:users,username,'.$req->id_pengguna,
-            'name' => 'required|string|max:100',
-            'email' => 'required|email|unique:users,email,'.$req->id_pengguna,
+            'id_user_level' => 'required',
+        ];
+    } else {
+        $rules = [
+            'username'      => 'required|string|max:50|unique:users,username,'.$req->id_pengguna,
+            'name'          => 'required|string|max:100',
+            'email'         => 'required|email|unique:users,email,'.$req->id_pengguna,
             'id_user_level' => 'required',
         ];
 
         if ($req->filled('password')) {
             $rules['password'] = [
                 'confirmed',
-                Password::min(12)
-                    ->mixedCase()
-                    ->numbers()
-                    ->symbols(),
+                Password::min(12)->mixedCase()->numbers()->symbols(),
             ];
         }
+    }
 
-        $req->validate($rules);
+    $req->validate($rules);
 
+    // Data yang diupdate
+    if ($isSso) {
+        // User SSO: hanya level dan is_active
         $data = [
-            'username' => $req->username,
-            'name' => $req->name,
-            'email' => $req->email,
             'id_user_level' => $req->id_user_level,
-            'updated_at' => now(),
+            'is_active'     => $req->has('is_active') ? 1 : 0,
+            'updated_at'    => now(),
+        ];
+    } else {
+        // User manual: semua field
+        $data = [
+            'username'      => $req->username,
+            'name'          => $req->name,
+            'email'         => $req->email,
+            'id_user_level' => $req->id_user_level,
+            'is_active'     => $req->has('is_active') ? 1 : 0,
+            'updated_at'    => now(),
         ];
 
-        // kalau password diisi
         if ($req->filled('password')) {
-
-            $user = DB::table('users')->where('id', $req->id_pengguna)->first();
-
-            // ❗ cek password tidak boleh sama
             if (Hash::check($req->password, $user->password)) {
                 return response()->json([
-                    'result' => 'failed',
+                    'result'  => 'failed',
                     'message' => 'Password tidak boleh sama dengan sebelumnya',
                 ]);
             }
-
             $data['password'] = Hash::make($req->password);
         }
-
-        DB::table('users')->where('id', $req->id_pengguna)->update($data);
-
-        return response()->json([
-            'result' => 'success',
-            'message' => 'User berhasil diupdate',
-        ]);
     }
+
+    DB::table('users')->where('id', $req->id_pengguna)->update($data);
+
+    return response()->json([
+        'result'  => 'success',
+        'message' => 'User berhasil diupdate',
+    ]);
+}
 
     public function delete(Request $req)
     {
