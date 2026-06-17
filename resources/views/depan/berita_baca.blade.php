@@ -77,13 +77,17 @@
                     </form>
 
                     @if ($kategori->count() != 0)
-                        <h5 class="font-weight-semi-bold pt-4">Kategori</h5>
-                        <ul class="nav nav-list flex-column mb-5">
-                            @foreach ($kategori->get() as $kat)
-                                <li class="nav-item"><a class="nav-link" href="{{ url('/berita-kategori/'.$kat->kategori_slug) }}">{{ $kat->kategori_berita }}</a></li>
-                            @endforeach
-                        </ul>    
-                    @endif
+    <h5 class="font-weight-semi-bold pt-4">Kategori</h5>
+    <ul class="nav nav-list flex-column mb-5">
+        @foreach ($kategori as $kat)
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url('/berita-kategori/'.$kat->kategori_slug) }}">
+                    {{ $kat->kategori_berita }}
+                </a>
+            </li>
+        @endforeach
+    </ul>
+@endif
                     
                     <h5>Infografis</h5>
                     <div class="owl-carousel owl-theme nav-inside nav-inside-edge nav-squared nav-with-transparency nav-dark" data-plugin-options="{'items': 1, 'margin': 10, 'loop': false, 'nav': true, 'dots': false}">

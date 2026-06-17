@@ -22,16 +22,16 @@
                     <label class="labelku" style="color: #626365;font-size:13px;"><b>Kategori:</b></label>
                     <select class="form-control" id="kategori_publikasi" name="kategori_publikasi" style="width: 60%;">
                         @if ($kategori->count() != 0)
-                            @foreach ($kategori->get() as $kat)
-                                @if ($kat->id_publikasi_kategori == $data->id_publikasi_kategori)
-                                    <option value="{{ $kat->id_publikasi_kategori }}" selected>{{ $kat->nama_kategori }}</option>
-                                @else
-                                    <option value="{{ $kat->id_publikasi_kategori }}">{{ $kat->nama_kategori }}</option>
-                                @endif
-                            @endforeach
-                        @else
-                            <option>Kategori not found</option>
-                        @endif
+    @foreach ($kategori as $kat)
+        @if ($kat->id_publikasi_kategori == $data->id_publikasi_kategori)
+            <option value="{{ $kat->id_publikasi_kategori }}" selected>{{ $kat->nama_kategori }}</option>
+        @else
+            <option value="{{ $kat->id_publikasi_kategori }}">{{ $kat->nama_kategori }}</option>
+        @endif
+    @endforeach
+@else
+    <option>Kategori not found</option>
+@endif
                     </select>
                 </div>
                 <div class="form-group mb-1">

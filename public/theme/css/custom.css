@@ -1,6 +1,12 @@
 /* ═══════════════════════════════
    STRUKTUR ORGANISASI
 ═══════════════════════════════ */
+
+#strukturOrganisasi {
+    width: 100%;
+    overflow-x: auto;
+}
+
 .so-tree {
     display: flex;
     flex-direction: column;
@@ -12,22 +18,81 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
 }
 
 .so-level {
     display: flex;
+    flex-direction: row;
     justify-content: center;
-    flex-wrap: wrap;
+    align-items: flex-start;
+    flex-wrap: nowrap;
     gap: 16px;
     width: 100%;
+    position: relative;
+    min-width: max-content;
 }
 
-/* Garis vertikal penghubung */
+/* Level grandchildren ke bawah boleh wrap kalau kepanjangan */
+.so-group .so-group .so-level {
+    flex-wrap: wrap;
+    min-width: unset;
+}
+
+/* ── Garis vertikal tunggal: dari card induk turun ke titik cabang ──
+   Elemen ini sudah ada di HTML sebagai sibling antara .so-card dan .so-level */
 .so-connector-v {
     width: 2px;
     height: 32px;
     background-color: #2d8a45;
     margin: 0 auto;
+}
+
+/* ── Garis horizontal + garis turun kecil di titik cabang ──
+   Tiap .so-group langsung di dalam .so-level dapat:
+   - ::before  = garis vertikal kecil turun ke card-nya
+   - ::after   = garis horizontal menyambung ke sibling kiri/kanan
+   Sibling pertama & terakhir cuma dapat separuh garis horizontal,
+   supaya gabungan semua ::after di satu level pas dari tengah card
+   pertama sampai tengah card terakhir, tanpa nongol ke luar. */
+.so-level {
+    padding-top: 16px;
+}
+
+.so-level > .so-group::before {
+    content: '';
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    width: 2px;
+    height: 16px;
+    background-color: #2d8a45;
+    transform: translateX(-1px);
+}
+
+.so-level > .so-group::after {
+    content: '';
+    position: absolute;
+    top: -17px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #2d8a45;
+}
+
+.so-level > .so-group:first-child::after {
+    left: 50%;
+}
+
+.so-level > .so-group:last-child::after {
+    right: 50%;
+}
+
+/* Kalau cuma 1 anak, tidak perlu cabang horizontal maupun turun kecil —
+   garis lurus dari .so-connector-v sudah cukup */
+.so-level > .so-group:only-child::before,
+.so-level > .so-group:only-child::after {
+    display: none;
 }
 
 /* ── Base Card ── */
@@ -43,6 +108,8 @@
     border-top: 4px solid #2d8a45;
     width: 170px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    z-index: 1;
 }
 
 .so-card:hover {
@@ -67,7 +134,7 @@
     object-position: top;
     border: 3px solid #ffffff;
     box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-    image-rendering: -webkit-optimize-contrast; /* ✅ tambah ini */
+    image-rendering: -webkit-optimize-contrast;
 }
 
 /* ── Info (nama & jabatan) ── */
@@ -105,7 +172,7 @@
 .so-card--top .so-card__photo img {
     width: 100px;
     height: 100px;
-    image-rendering: -webkit-optimize-contrast; /* ✅ tambah ini */
+    image-rendering: -webkit-optimize-contrast;
 }
 
 .so-card--top .so-card__jabatan {
@@ -168,57 +235,4 @@
     .so-card--top .so-card__photo img { width: 75px; height: 75px; }
     .so-card__jabatan { font-size: 0.6rem; }
     .so-card__nama    { font-size: 0.65rem; }
-}
-
-/* Pastikan so-level di dalam so-group tidak collapse */
-.so-group > .so-level {
-    margin-top: 0;
-    justify-content: center;
-}
-
-/* Garis horizontal penghubung antar sibling */
-.so-level {
-    position: relative;
-}
-
-/* Force flex layout untuk struktur organisasi */
-.so-tree,
-.so-tree .so-group,
-.so-tree .so-level {
-    display: flex !important;
-}
-
-.so-tree {
-    flex-direction: column;
-    align-items: center;
-}
-
-.so-tree .so-group {
-    flex-direction: column;
-    align-items: center;
-}
-
-.so-tree .so-level {
-    flex-direction: row !important;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 16px;
-    width: 100%;
-}
-
-/* Biar container tidak membatasi lebar tree */
-#strukturOrganisasi {
-    width: 100%;
-    overflow-x: auto;
-}
-
-#strukturOrganisasi .so-level {
-    min-width: max-content;
-    flex-wrap: nowrap !important; /* cegah wrap ke bawah */
-}
-
-/* Khusus level grandchildren boleh wrap */
-#strukturOrganisasi .so-level .so-level {
-    flex-wrap: wrap !important;
-    min-width: unset;
 }
