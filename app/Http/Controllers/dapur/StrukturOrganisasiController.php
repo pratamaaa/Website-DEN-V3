@@ -7,7 +7,7 @@ namespace App\Http\Controllers\dapur;
 use App\Http\Controllers\Controller;
 use App\Models\StrukturOrganisasi;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
 use Yajra\DataTables\Facades\DataTables;
@@ -32,8 +32,8 @@ class StrukturOrganisasiController extends Controller
             ->addIndexColumn()
             ->addColumn('foto_preview', function ($row) {
                 $src = $row->foto
-                    ? asset('uploads/strukturorganisasi/'.$row->foto)
-                    : asset('uploads/default-image/default-avatar.png');
+                    ? asset('storage/strukturorganisasi/'.$row->foto)
+                    : asset('storage/default-image/default-avatar.png');
 
                 return '<img src="'.$src.'" width="45px" height="45px" style="border-radius:50%;object-fit:cover;border:2px solid #ddd;">';
             })
@@ -74,7 +74,7 @@ class StrukturOrganisasiController extends Controller
     {
         return view('dapur.strukturorganisasi.add', [
             'judulmodal' => 'Tambah Pejabat',
-            'parents' => StrukturOrganisasi::where('is_active', 'yes')
+            'parents'    => StrukturOrganisasi::where('is_active', 'yes')
                 ->orderBy('urutan')->get(),
         ]);
     }
@@ -84,12 +84,12 @@ class StrukturOrganisasiController extends Controller
         $namafile = $this->uploadFoto($req);
 
         $so = StrukturOrganisasi::create([
-            'id_parent' => $req->id_parent ?? 0,
+            'id_parent'    => $req->id_parent ?? 0,
             'nama_lengkap' => $req->nama_lengkap,
-            'jabatan' => $req->jabatan,
-            'foto' => $namafile,
-            'urutan' => $req->urutan ?? 0,
-            'is_active' => $req->is_active ?? 'yes',
+            'jabatan'      => $req->jabatan,
+            'foto'         => $namafile,
+            'urutan'       => $req->urutan ?? 0,
+            'is_active'    => $req->is_active ?? 'yes',
         ]);
 
         audit_log('Tambah Struktur Organisasi: '.$so->jabatan, 'StrukturOrganisasi');
@@ -103,8 +103,8 @@ class StrukturOrganisasiController extends Controller
 
         return view('dapur.strukturorganisasi.edit', [
             'judulmodal' => 'Edit Pejabat',
-            'data' => $data,
-            'parents' => StrukturOrganisasi::where('is_active', 'yes')
+            'data'       => $data,
+            'parents'    => StrukturOrganisasi::where('is_active', 'yes')
                 ->where('id_so', '!=', $req->id)
                 ->orderBy('urutan')->get(),
         ]);
@@ -119,12 +119,12 @@ class StrukturOrganisasiController extends Controller
             : $req->foto_current;
 
         $so->update([
-            'id_parent' => $req->id_parent ?? 0,
+            'id_parent'    => $req->id_parent ?? 0,
             'nama_lengkap' => $req->nama_lengkap,
-            'jabatan' => $req->jabatan,
-            'foto' => $namafile,
-            'urutan' => $req->urutan ?? 0,
-            'is_active' => $req->is_active ?? 'yes',
+            'jabatan'      => $req->jabatan,
+            'foto'         => $namafile,
+            'urutan'       => $req->urutan ?? 0,
+            'is_active'    => $req->is_active ?? 'yes',
         ]);
 
         audit_log('Update Struktur Organisasi: '.$so->jabatan, 'StrukturOrganisasi');
@@ -149,21 +149,19 @@ class StrukturOrganisasiController extends Controller
     private function uploadFoto(Request $req): string
     {
         if ($req->hasFile('foto')) {
-            $file = $req->file('foto');
+            $file        = $req->file('foto');
             $namafileOri = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-            $ekstensi = $file->getClientOriginalExtension();
-            $namafile = $namafileOri.'_'.time().'.'.$ekstensi;
+            $ekstensi    = $file->getClientOriginalExtension();
+            $namafile    = $namafileOri.'_'.time().'.'.$ekstensi;
 
-            $destination = public_path('uploads/strukturorganisasi');
-            if (! file_exists($destination)) {
-                mkdir($destination, 0755, true);
-            }
-
-            // ✅ Intervention Image v3
+            // Resize + crop 300x300 via Intervention Image v3
             $manager = new ImageManager(new Driver);
-            $manager->read($file->getRealPath())
+            $image   = $manager->read($file->getRealPath())
                 ->cover(300, 300)
-                ->save($destination.'/'.$namafile);
+                ->toJpeg();
+
+            // Simpan ke storage/app/public/strukturorganisasi/
+            Storage::disk('public')->put('strukturorganisasi/'.$namafile, $image);
 
             return $namafile;
         }
@@ -173,9 +171,8 @@ class StrukturOrganisasiController extends Controller
 
     private function deleteFoto(?string $namafile): void
     {
-        $path = public_path('uploads/strukturorganisasi/'.$namafile); // ✅ pakai public_path()
-        if ($namafile && File::exists($path)) {
-            File::delete($path);
+        if ($namafile && Storage::disk('public')->exists('strukturorganisasi/'.$namafile)) {
+            Storage::disk('public')->delete('strukturorganisasi/'.$namafile);
         }
     }
 }

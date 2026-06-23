@@ -6,7 +6,7 @@
         <div class="so-group">
             <div class="so-card so-card--level{{ $level }}">
                 <div class="so-card__photo">
-                    <img src="{{ $child->foto ? asset('uploads/strukturorganisasi/' . $child->foto) : asset('uploads/default-image/default-avatar.png') }}"
+                    <img src="{{ $child->foto ? asset('storage/strukturorganisasi/' . $child->foto) : asset('storage/default-image/default-avatar.png') }}"
                         alt="{{ $child->nama_lengkap }}">
                 </div>
                 <div class="so-card__info">
@@ -23,7 +23,7 @@
                         <div class="so-group">
                             <div class="so-card so-card--level{{ $level + 1 }}">
                                 <div class="so-card__photo">
-                                    <img src="{{ $grandchild->foto ? asset('uploads/strukturorganisasi/' . $grandchild->foto) : asset('uploads/default-image/default-avatar.png') }}"
+                                    <img src="{{ $grandchild->foto ? asset('storage/strukturorganisasi/' . $grandchild->foto) : asset('storage/default-image/default-avatar.png') }}"
                                         alt="{{ $grandchild->nama_lengkap }}">
                                 </div>
                                 <div class="so-card__info">

@@ -30,7 +30,7 @@
                         {{-- Card Top Level --}}
                         <div class="so-card so-card--top">
                             <div class="so-card__photo">
-                                <img src="{{ $topLevel->foto ? asset('uploads/strukturorganisasi/' . $topLevel->foto) : asset('uploads/default-image/default-avatar.png') }}"
+                                <img src="{{ $topLevel->foto ? asset('storage/strukturorganisasi/' . $topLevel->foto) : asset('storage/default-image/default-avatar.png') }}"
                                     alt="{{ $topLevel->nama_lengkap }}">
                             </div>
                             <div class="so-card__info">
