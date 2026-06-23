@@ -28,7 +28,7 @@ class InfografisController extends Controller
                 return '<p class="ndrparagraf">'.$row->judul_infografis.'</p>';
             })
             ->addColumn('gambarsampul', function ($row) {
-                return '<img src="'.asset('uploads/infografis/'.$row->gambar_sampul).'" width="100px" style="margin-top:10px;border-radius:5px;border:1px solid #cdcdcd;">';
+                return '<img src="'.asset('storage/infografis/'.$row->gambar_sampul).'" width="100px" style="margin-top:10px;border-radius:5px;border:1px solid #cdcdcd;">';
             })
             ->addColumn('file', function ($row) {
                 if ($row->berkas != '') {
