@@ -8,6 +8,7 @@ use App\Models\Imageslider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Storage;
 
 class ImagesliderController extends Controller
 {
@@ -25,7 +26,7 @@ class ImagesliderController extends Controller
         return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('gambarslider', function ($row) {
-                return '<img src="'.asset('uploads/imagesliders/'.$row->gambar).'" width="100px" style="margin-top:10px;border-radius:5px;border:1px solid #cdcdcd;">';
+                return '<img src="'.asset('storage/imagesliders/'.$row->gambar).'" width="100px" style="margin-top:10px;border-radius:5px;border:1px solid #cdcdcd;">';
             })
             ->addColumn('isactive', function ($row) {
                 return $row->is_active == 'yes'
@@ -148,12 +149,9 @@ class ImagesliderController extends Controller
     {
         $slider = Imageslider::findOrFail($req->id);
 
-        // Hapus file gambar dari storage jika ada
-        // $pathGambar = 'public/uploads/imagesliders/'.$slider->gambar;
-        $pathGambar = public_path('uploads/imagesliders/'.$slider->gambar);
-        if ($slider->gambar && File::exists($pathGambar)) {
-            File::delete($pathGambar);
-        }
+           if ($slider->gambar && Storage::disk('public')->exists('imagesliders/'.$slider->gambar)) {
+    Storage::disk('public')->delete('imagesliders/'.$slider->gambar);
+}
 
         $judul = $slider->judul_slider;
         $slider->delete();
@@ -166,27 +164,20 @@ class ImagesliderController extends Controller
         ]);
     }
 
-    // ✅ Private helper untuk upload gambar, menghindari duplikasi kode
     private function uploadGambar(Request $req): string
-    {
-        if ($req->hasFile('gambar')) {
-            $file = $req->file('gambar');
-            $namafileOri = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-            $ekstensi = $file->getClientOriginalExtension();
-            $namagambar = $namafileOri.'_'.time().'.'.$ekstensi;
+{
+    if ($req->hasFile('gambar')) {
+        $file = $req->file('gambar');
+        $namafileOri = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $ekstensi = $file->getClientOriginalExtension();
+        $namagambar = $namafileOri.'_'.time().'.'.$ekstensi;
 
-            $destination = public_path('uploads/imagesliders');
+        // Simpan ke storage/app/public/imagesliders/
+        $file->storeAs('imagesliders', $namagambar, 'public');
 
-            // bikin folder kalau belum ada
-            if (! File::exists($destination)) {
-                File::makeDirectory($destination, 0755, true);
-            }
-
-            $file->move($destination, $namagambar);
-
-            return $namagambar;
-        }
-
-        return '';
+        return $namagambar;
     }
+
+    return '';
+}
 }

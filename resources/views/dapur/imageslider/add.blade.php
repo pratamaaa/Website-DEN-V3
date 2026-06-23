@@ -142,21 +142,15 @@
             height: 100,
         });
     
-        $('#formulir').validate({
-        rules: {
-            judul_slider: {
-                required: true
-            },
-            alamat_url: {
-                required: true
-            },
-            gambar: {
-                required: true
-            },
-            tanggal_publikasi: {
-                required: true
-            },
-        }
-        });
+       $('#formulir').validate({
+    rules: {
+        judul_slider: {
+            required: true
+        },
+        tanggal_publikasi: {
+            required: true
+        },
+    }
+});
     });
     </script>

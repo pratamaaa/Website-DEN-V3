@@ -16,7 +16,7 @@
                         {{-- @foreach ($sliders->get() as $sli) --}}
                         @foreach ($sliders as $sli)
                             <li data-transition="fade">
-                                <img src="{{ asset('uploads/imagesliders/' . $sli->gambar) }}" alt=""
+                                <img src="{{ Storage::url('imagesliders/' . $sli->gambar) }}" alt=""
                                     data-bgposition="center center" data-bgfit="cover" data-bgrepeat="no-repeat"
                                     class="rev-slidebg">
                             </li>
