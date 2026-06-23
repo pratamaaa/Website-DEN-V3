@@ -43,7 +43,7 @@
 
         {{-- KETUA --}}
         <div class="so-pimpinan-card so-pimpinan-ketua">
-                <img src="{{ $k ? asset('uploads/profilden/'.$k->foto) : $defaultFoto }}"
+                <img src="{{ $k ? asset('storage/profilden/'.$k->foto) : $defaultFoto }}"
                      class="so-pimpinan-photo" alt="{{ $k?->namalengkap ?? 'Ketua' }}">
                 <div class="so-pimpinan-info">
                     <div class="so-pimpinan-name">{{ $k?->namalengkap ?? 'Belum diset' }}</div>
@@ -63,7 +63,7 @@
 
             {{-- WAKIL KETUA --}}
             <div class="so-pimpinan-card so-pimpinan-wakil">
-                <img src="{{ $w ? asset('uploads/profilden/'.$w->foto) : $defaultFoto }}"
+                <img src="{{ $w ? asset('storage/profilden/'.$w->foto) : $defaultFoto }}"
                      class="so-pimpinan-photo" alt="{{ $w?->namalengkap ?? 'Wakil Ketua' }}">
                 <div class="so-pimpinan-info">
                     <div class="so-pimpinan-name">{{ $w?->namalengkap ?? 'Belum diset' }}</div>
@@ -83,7 +83,7 @@
 
             {{-- KETUA HARIAN --}}
             <div class="so-pimpinan-card so-pimpinan-harian">
-                <img src="{{ $kh ? asset('uploads/profilden/'.$kh->foto) : $defaultFoto }}"
+                <img src="{{ $kh ? asset('storage/profilden/'.$kh->foto) : $defaultFoto }}"
                      class="so-pimpinan-photo" alt="{{ $kh?->namalengkap ?? 'Ketua Harian' }}">
                 <div class="so-pimpinan-info">
                     <div class="so-pimpinan-name">{{ $kh?->namalengkap ?? 'Belum diset' }}</div>
@@ -121,7 +121,7 @@
                 @else
                     @foreach($apData as $item)
                         <div class="so-anggota-card">
-                            <img src="{{ asset('uploads/profilden/'.$item->foto) }}"
+                            <img src="{{ asset('storage/profilden/'.$item->foto) }}"
                                  class="so-anggota-photo" alt="{{ $item->namalengkap }}">
                             <div class="so-anggota-name">{{ $item->namalengkap }}</div>
                             <div class="so-anggota-role">{{ $item->jabatan }}</div>
@@ -142,7 +142,7 @@
                 @else
                     @foreach($apkData as $item)
                         <div class="so-anggota-card">
-                            <img src="{{ asset('uploads/profilden/'.$item->foto) }}"
+                            <img src="{{ asset('storage/profilden/'.$item->foto) }}"
                                  class="so-anggota-photo" alt="{{ $item->namalengkap }}">
                             <div class="so-anggota-name">{{ $item->namalengkap }}</div>
                             <div class="so-anggota-role">{{ $item->jabatan }}</div>
