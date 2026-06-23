@@ -38,12 +38,15 @@ class BeritaController extends Controller
             ->addColumn('judulberita', fn ($row) => '<p class="ndrparagraf">'.$row->judul.'</p>')
 
             ->addColumn('thumbnail', function ($row) {
-                $src = $row->gambar
-                    ? asset('storage/berita/'.$row->gambar)
-                    : asset('uploads/default-image/default-avatar.png');
+    $src = $row->gambar
+        ? asset('storage/berita/'.$row->gambar)
+        : asset('uploads/default-image/default-avatar.png');
 
-                return '<img src="'.$src.'" width="80px" style="border-radius:5px;border:1px solid #cdcdcd;object-fit:cover;">';
-            })
+    return '<img src="'.$src.'" 
+        width="80px" 
+        height="55px" 
+        style="border-radius:5px;border:1px solid #cdcdcd;object-fit:cover;object-position:center;">';
+})
 
             ->addColumn('posting', fn ($row) => '<p class="ndrparagraf">'.Gudangfungsi::tanggalindoshort($row->tanggal_publikasi).'</p>')
 

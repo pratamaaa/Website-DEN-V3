@@ -50,14 +50,13 @@
                                     width="100%">
                                     <thead>
                                         <tr>
-                                            <th width="5%">No</th>
-                                            <th width="30%">Berita</th>
-                                            <th width="10%">Foto</th>
-                                            <th width="20%">Kategori</th>
-                                            <th width="15%">Posting</th>
-                                            <th width="10%">Status</th>
-                                            <th width="10%">Hits</th>
-                                            <th width="10%">Aksi</th>
+                                            <th width="25%">Berita</th>   {{-- dari 30% --}}
+<th width="8%">Foto</th>      {{-- lebih kecil --}}
+<th width="15%">Kategori</th>
+<th width="12%">Posting</th>
+<th width="10%">Status</th>
+<th width="8%">Hits</th>
+<th width="10%">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
