@@ -29,7 +29,7 @@
                     <article class="post post-large">
                         <div class="post-content ratajustify">
                             @if ($profil->is_konten_gambar == 'yes')
-                                <img src="{{asset('uploads/profilden/'.$profil->konten_gambar)}}" class="img-fluid img-thumbnail img-thumbnail-no-borders rounded-0" alt="" />
+                                <img src="{{asset('storage/profilden/'.$profil->konten_gambar)}}" class="img-fluid img-thumbnail img-thumbnail-no-borders rounded-0" alt="" />
                             @else
                                 @php echo $profil->konten; @endphp
                             @endif
