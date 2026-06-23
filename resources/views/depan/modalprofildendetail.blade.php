@@ -6,7 +6,7 @@
 <div class="modal-body">
     <div class="row">
         <div class="col-lg-3">
-            <img src="{{ asset('uploads/profilden/'.$den->foto) }}" class="img-fluid" alt="">
+            <img src="{{ asset('storage/profilden/'.$den->foto) }}" class="img-fluid" alt="">
         </div>
         
         <div class="col-lg-9">
