@@ -47,7 +47,7 @@
                                                 src="{{ asset('storage/berita/' . $berita->gambar) }}">
                                         @else
                                             <img alt="" class="img-fluid rounded"
-                                                src="{{ asset('uploads/logo/logoden-default2.jpg') }}">
+                                                src="{{ asset('storage/logo/logoden-default2.jpg') }}">
                                         @endif
                                         <p class="text-2 marginatas-10 marginbawah-10 lineheight-17 ratakiri">
                                             <i class="fa fa-calendar"></i>
@@ -441,7 +441,7 @@
                                             if ($prokumden->gambar_sampul == '') {
                                                 $cover = 'theme/img/team/team-1.jpg';
                                             } else {
-                                                $cover = 'uploads/publikasi-image/' . $prokumden->gambar_sampul;
+                                                $cover = 'storage/publikasi-image/' . $prokumden->gambar_sampul;
                                             }
 
                                         @endphp
@@ -692,9 +692,9 @@
                                     @foreach ($infografis as $info)
                                         <div>
                                             <a class="lightbox"
-                                                href="{{ asset('/uploads/infografis/' . $info->gambar_sampul) }}"
+                                                href="{{ asset('/storage/infografis/' . $info->gambar_sampul) }}"
                                                 data-plugin-options="{'type':'image'}">
-                                                <img src="{{ asset('/uploads/infografis/' . $info->gambar_sampul) }}"
+                                                <img src="{{ asset('/storage/infografis/' . $info->gambar_sampul) }}"
                                                     class="img-fluid rounded-0 mb-2 kotakku" style="min-height: 280px;"
                                                     alt="">
                                             </a>
