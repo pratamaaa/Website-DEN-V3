@@ -44,7 +44,7 @@
                                     <a href="{{ url('/berita/' . $berita->slug) }}">
                                         @if ($berita->gambar != '')
                                             <img alt="" class="img-fluid rounded"
-                                                src="{{ asset('uploads/berita/' . $berita->gambar) }}">
+                                                src="{{ asset('storage/berita/' . $berita->gambar) }}">
                                         @else
                                             <img alt="" class="img-fluid rounded"
                                                 src="{{ asset('uploads/logo/logoden-default2.jpg') }}">
