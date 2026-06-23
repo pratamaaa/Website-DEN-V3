@@ -50,6 +50,7 @@
                                     width="100%">
                                     <thead>
                                         <tr>
+                                            <th width="5%">No</th>
                                             <th width="25%">Berita</th>   {{-- dari 30% --}}
 <th width="8%">Foto</th>      {{-- lebih kecil --}}
 <th width="15%">Kategori</th>
