@@ -52,6 +52,7 @@
                                         <tr>
                                             <th width="5%">No</th>
                                             <th width="30%">Berita</th>
+                                            <th width="10%">Foto</th>
                                             <th width="20%">Kategori</th>
                                             <th width="15%">Posting</th>
                                             <th width="10%">Status</th>
@@ -107,6 +108,7 @@
                         data: 'judulberita',
                         name: 'judul'
                     },
+                    { data: 'thumbnail', name: 'thumbnail', orderable: false, searchable: false },
                     {
                         data: 'kategori_berita',
                         name: 'kategori_berita'
