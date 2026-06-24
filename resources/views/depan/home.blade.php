@@ -437,50 +437,49 @@
             </div>{{-- end col kiri --}}
 
             {{-- KOLOM KANAN: Video featured --}}
-            <div class="col-lg-6">
-                <h4 class="ratakiri warna-hitam mb-3">
-                    <a href="{{ url('/video') }}" class="warna-hitam">
-                        Video <i class="fas fa-angle-right text-2"></i>
-                    </a>
-                </h4>
-                @if ($videos->count() > 0)
-                    @php $featuredVideo = $videos->first(); @endphp
-                    <div class="ratio ratio-16x9 mb-3" style="border-radius: 10px; overflow: hidden;">
-                        <iframe
-                            src="https://www.youtube.com/embed/{{ $featuredVideo->youtube_id }}?showinfo=0&wmode=opaque"
-                            frameborder="0" allowfullscreen>
-                        </iframe>
-                    </div>
-                    <p class="text-2 mb-0 lineheight-17 warna-putih font-weight-bold">
-                        {{ Str::limit($featuredVideo->judul, 100) }}
-                    </p>
-                    @if ($videos->count() > 1)
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px;">
-                            @foreach ($videos->skip(1) as $vid)
-                                <a href="https://www.youtube.com/watch?v={{ $vid->youtube_id }}"
-                                    target="_blank" style="text-decoration: none;">
-                                    <div style="position: relative;">
-                                        <img src="https://img.youtube.com/vi/{{ $vid->youtube_id }}/mqdefault.jpg"
-                                            style="width:100%; height:90px; object-fit:cover; border-radius:8px;" alt="">
-                                        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
-                                            <div style="width:28px; height:28px; background:rgba(255,0,0,0.85); border-radius:50%; display:flex; align-items:center; justify-content:center;">
-                                                <div style="border-left:10px solid #fff; border-top:6px solid transparent; border-bottom:6px solid transparent; margin-left:3px;"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p style="font-size:11px; color:rgba(255,255,255,0.7); margin: 6px 0 0; line-height:1.3;">
-                                        {{ Str::limit($vid->judul, 55) }}
-                                    </p>
-                                </a>
-                            @endforeach
+<div class="col-lg-6">
+    <h4 class="ratakiri warna-hitam mb-3">
+        <a href="{{ url('/video') }}" class="warna-hitam">
+            Video <i class="fas fa-angle-right text-2"></i>
+        </a>
+    </h4>
+    @if ($videos->count() > 0)
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+            @foreach ($videos as $vid)
+                <a href="https://www.youtube.com/watch?v={{ $vid->youtube_id }}"
+                    target="_blank" style="text-decoration: none; display: flex; gap: 14px; align-items: flex-start; background: rgba(255,255,255,0.06); border-radius: 10px; padding: 10px; transition: background 0.2s;"
+                    onmouseover="this.style.background='rgba(255,255,255,0.12)'"
+                    onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+                    <div style="position: relative; flex-shrink: 0; width: 180px;">
+                        <img src="https://img.youtube.com/vi/{{ $vid->youtube_id }}/mqdefault.jpg"
+                            style="width:180px; height:101px; object-fit:cover; border-radius:8px; display:block;" alt="">
+                        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+                            <div style="width:44px; height:44px; background:rgba(255,0,0,0.9); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                <div style="border-left:16px solid #fff; border-top:9px solid transparent; border-bottom:9px solid transparent; margin-left:4px;"></div>
+                            </div>
                         </div>
-                    @endif
-                @else
-                    <div class="text-center py-4">
-                        <p class="warna-light">Belum ada video.</p>
                     </div>
-                @endif
-            </div>{{-- end col kanan --}}
+                    <div style="flex: 1; padding-top: 4px;">
+                        <p style="font-size:13px; font-weight:600; color:rgba(255,255,255,0.9); margin:0 0 6px; line-height:1.4;">
+                            {{ Str::limit($vid->judul, 80) }}
+                        </p>
+                        <p style="font-size:11px; color:rgba(255,255,255,0.45); margin:0;">
+                            <i class="fa fa-calendar me-1"></i>
+                            {{ App\Helpers\Gudangfungsi::tanggalindoshort($vid->tanggal_publikasi) }}
+                        </p>
+                        <span style="font-size:11px; color:#ff4444; margin-top:6px; display:inline-block;">
+                            <i class="fab fa-youtube me-1"></i> Tonton di YouTube
+                        </span>
+                    </div>
+                </a>
+            @endforeach
+        </div>
+    @else
+        <div class="text-center py-4">
+            <p class="warna-light">Belum ada video.</p>
+        </div>
+    @endif
+</div>
 
         </div>{{-- end row baris atas --}}
 
