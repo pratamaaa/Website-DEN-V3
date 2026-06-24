@@ -40,9 +40,9 @@
                                     <div class="post-image">
                                         <a href="{{ url('/berita', $brt->slug) }}">
                                             @if ($brt->gambar != '')
-                                            <img src="{{asset('uploads/berita/'.$brt->gambar)}}" class="img-fluid img-thumbnail img-thumbnail-no-borders rounded-0" alt="" />
+                                            <img src="{{asset('storage/berita/'.$brt->gambar)}}" class="img-fluid img-thumbnail img-thumbnail-no-borders rounded-0" alt="" />
                                             @else
-                                            <img src="{{asset('uploads/logo/logoden-default.jpg')}}" class="img-fluid img-thumbnail img-thumbnail-no-borders rounded-0" alt="">
+                                            <img src="{{asset('storage/logo/logoden-default.jpg')}}" class="img-fluid img-thumbnail img-thumbnail-no-borders rounded-0" alt="">
                                             @endif
                                         </a>
                                     </div>

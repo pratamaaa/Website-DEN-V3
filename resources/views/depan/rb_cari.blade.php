@@ -59,7 +59,7 @@
 
                     @foreach ($data as $brt)
                         @php
-                            $gambarsampul = ($brt->gambar_sampul == '' ? asset('/uploads/default-image/sampul-rb.jpg') : asset('/uploads/default-image/'.$brt->gambar_sampul));
+                            $gambarsampul = ($brt->gambar_sampul == '' ? asset('/storage/default-image/sampul-rb.jpg') : asset('/storage/default-image/'.$brt->gambar_sampul));
                         @endphp
                         <article class="post post-medium">
                             <div class="row mb-3">
