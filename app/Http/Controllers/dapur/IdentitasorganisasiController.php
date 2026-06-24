@@ -107,6 +107,7 @@ class IdentitasorganisasiController extends Controller
                 'facebook' => $facebook,
                 'twitter' => $twitter,
                 'youtube' => $youtube,
+                'instagram_embed_url' => $req->post('instagram_embed_url'),
                 ];
         
         try{
@@ -157,6 +158,7 @@ class IdentitasorganisasiController extends Controller
                         'facebook' => '-',
                         'twitter' => '-',
                         'youtube' => '-',
+                        'instagram_embed_url' => '',
                         ];
         $hapus = DB::table('identitas_organisasi')->where('id_identitas_organisasi', $id)->update($dataupdate);
 

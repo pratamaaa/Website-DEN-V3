@@ -63,6 +63,17 @@
                     <input type="input" class="form-control form-control-sm" value="{{ $data->instagram }}" id="instagram" name="instagram" style="width: 100%;">
                 </div>
                 <div class="form-group mb-1">
+    <label class="labelku" style="color: #626365;font-size:13px;">
+        <b>Instagram Embed URL:</b>
+        <small class="text-muted font-weight-normal"> (URL post Instagram yang mau ditampilkan di homepage)</small>
+    </label>
+    <input type="text" class="form-control form-control-sm" 
+        value="{{ $data->instagram_embed_url }}" 
+        id="instagram_embed_url" name="instagram_embed_url" 
+        placeholder="https://www.instagram.com/p/XXXXX/">
+    <small class="text-muted">Contoh: https://www.instagram.com/p/DZ3xqy7kxAj/</small>
+</div>
+                <div class="form-group mb-1">
                     <label class="labelku" style="color: #626365;font-size:13px;"><b>Facebook:</b></label>
                     <input type="input" class="form-control form-control-sm" value="{{ $data->facebook }}" id="facebook" name="facebook" style="width: 100%;">
                 </div>

@@ -55,7 +55,7 @@ public function index()
                 ->whereNotNull('youtube_id')
                 ->where('youtube_id', '!=', '')
                 ->orderBy('tanggal_publikasi', 'desc')
-                ->limit(3)
+                ->limit(6)
                 ->get(),
 
             'infografis' => DB::table('infografis')

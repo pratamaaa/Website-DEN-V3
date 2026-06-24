@@ -325,10 +325,9 @@
             </div>
         </section>
 
-        {{-- ═══════════════════════════════════════════
-             MEDIA & PUBLIKASI
-        ═══════════════════════════════════════════ --}}
-
+{{-- ═══════════════════════════════════════════
+     MEDIA & PUBLIKASI
+═══════════════════════════════════════════ --}}
 <section class="section section-default border-0 section-center__ bg-white"
     style="background: url('{{ asset('theme/img/ndr-bg5.jpg') }}'); background-size:cover; background-position: 0 100%; margin: 0px !important;">
     <div class="container my-5 py-3">
@@ -366,19 +365,22 @@
                             </a>
                         </li>
                     </ul>
-                    <div class="tab-content" style="min-height: 400px;">
 
-                        {{-- Facebook --}}
+                    <div class="tab-content" style="min-height: 500px;">
+
+                        {{-- TAB FACEBOOK --}}
                         <div id="tabFacebook" class="tab-pane active pt-3">
-                            <iframe title="Facebook Page"
-                                src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fdewanenerginasional&tabs=timeline&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId=661144383905425&height=400"
-                                width="100%" height="400"
-                                style="border:none;overflow:hidden;border-radius:8px;"
-                                scrolling="no" frameborder="0" allowTransparency="true">
-                            </iframe>
+                            <div id="fbContainer" style="overflow: hidden; border-radius: 8px;">
+                                <iframe id="fbIframe" title="Facebook Page"
+                                    src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fdewanenerginasional&tabs=timeline&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId=661144383905425&height=500&width=500"
+                                    width="500" height="500"
+                                    style="border:none; overflow:hidden; transform-origin: top left;"
+                                    scrolling="no" frameborder="0" allowTransparency="true">
+                                </iframe>
+                            </div>
                         </div>
 
-                        {{-- Instagram --}}
+                        {{-- TAB INSTAGRAM --}}
                         <div id="tabInstagram" class="tab-pane pt-3">
                             @if ($identitas && $identitas->instagram_embed_url)
                                 <blockquote class="instagram-media" data-instgrm-captioned
@@ -390,64 +392,51 @@
                             @else
                                 <div class="text-center py-5">
                                     <p class="warna-light">Belum ada postingan Instagram yang ditampilkan.</p>
-                                    <a href="{{ url('/dap/identitasorganisasi') }}" class="btn btn-sm btn-outline-success">
-                                        Setting di Admin Panel
-                                    </a>
                                 </div>
                             @endif
                         </div>
 
-                        {{-- YouTube --}}
+                        {{-- TAB YOUTUBE --}}
                         <div id="tabYoutube" class="tab-pane pt-3">
                             @if ($identitas && $identitas->youtube)
                                 <div class="text-center mb-3">
-                                    <a href="{{ $identitas->youtube }}" target="_blank"
-                                        class="btn btn-sm btn-danger">
+                                    <a href="{{ $identitas->youtube }}" target="_blank" class="btn btn-sm btn-danger">
                                         <i class="fab fa-youtube me-1"></i> Kunjungi Channel YouTube
                                     </a>
                                 </div>
                             @endif
                             @if ($videos->count() > 0)
-                                <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
                                     @foreach ($videos as $vid)
                                         <a href="https://www.youtube.com/watch?v={{ $vid->youtube_id }}"
-                                            target="_blank"
-                                            style="display: flex; gap: 12px; align-items: flex-start; text-decoration: none; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 10px; transition: background 0.2s;"
-                                            onmouseover="this.style.background='rgba(255,255,255,0.1)'"
-                                            onmouseout="this.style.background='rgba(255,255,255,0.05)'">
-                                            <div style="position: relative; flex-shrink: 0; width: 120px;">
+                                            target="_blank" style="text-decoration: none; display: block;">
+                                            <div style="position: relative; margin-bottom: 8px;">
                                                 <img src="https://img.youtube.com/vi/{{ $vid->youtube_id }}/mqdefault.jpg"
-                                                    style="width:120px; height:68px; object-fit:cover; border-radius:6px;" alt="">
+                                                    style="width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:8px;" alt="">
                                                 <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
-                                                    <div style="width:28px; height:28px; background:rgba(255,0,0,0.85); border-radius:50%; display:flex; align-items:center; justify-content:center;">
-                                                        <div style="border-left:10px solid #fff; border-top:6px solid transparent; border-bottom:6px solid transparent; margin-left:3px;"></div>
+                                                    <div style="width:40px; height:40px; background:rgba(255,0,0,0.9); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                                        <div style="border-left:14px solid #fff; border-top:8px solid transparent; border-bottom:8px solid transparent; margin-left:4px;"></div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div style="flex: 1;">
-                                                <p style="font-size: 12px; font-weight: bold; color: rgba(255,255,255,0.9); margin: 0 0 4px; line-height: 1.4;">
-                                                    {{ Str::limit($vid->judul, 70) }}
-                                                </p>
-                                                <p style="font-size: 11px; color: rgba(255,255,255,0.45); margin: 0;">
-                                                    <i class="fa fa-calendar me-1"></i>
-                                                    {{ App\Helpers\Gudangfungsi::tanggalindoshort($vid->tanggal_publikasi) }}
-                                                </p>
-                                            </div>
+                                            <p style="font-size:11px; color:rgba(255,255,255,0.75); margin:0; line-height:1.4; text-align:center;">
+                                                {{ Str::limit($vid->judul, 50) }}
+                                            </p>
                                         </a>
                                     @endforeach
                                 </div>
                             @else
                                 <div class="text-center py-4">
-                                    <p class="warna-light">Belum ada video yang ditampilkan.</p>
+                                    <p class="warna-light">Belum ada video.</p>
                                 </div>
                             @endif
                         </div>
 
-                    </div>
-                </div>
-            </div>
+                    </div>{{-- end tab-content --}}
+                </div>{{-- end tabs --}}
+            </div>{{-- end col kiri --}}
 
-            {{-- KOLOM KANAN: Video featured (thumbnail besar pertama) --}}
+            {{-- KOLOM KANAN: Video featured --}}
             <div class="col-lg-6">
                 <h4 class="ratakiri warna-hitam mb-3">
                     <a href="{{ url('/video') }}" class="warna-hitam">
@@ -459,7 +448,8 @@
                     <div class="ratio ratio-16x9 mb-3" style="border-radius: 10px; overflow: hidden;">
                         <iframe
                             src="https://www.youtube.com/embed/{{ $featuredVideo->youtube_id }}?showinfo=0&wmode=opaque"
-                            frameborder="0" allowfullscreen></iframe>
+                            frameborder="0" allowfullscreen>
+                        </iframe>
                     </div>
                     <p class="text-2 mb-0 lineheight-17 warna-putih font-weight-bold">
                         {{ Str::limit($featuredVideo->judul, 100) }}
@@ -467,8 +457,8 @@
                     @if ($videos->count() > 1)
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px;">
                             @foreach ($videos->skip(1) as $vid)
-                                <a href="https://www.youtube.com/watch?v={{ $vid->youtube_id }}" target="_blank"
-                                    style="text-decoration: none;">
+                                <a href="https://www.youtube.com/watch?v={{ $vid->youtube_id }}"
+                                    target="_blank" style="text-decoration: none;">
                                     <div style="position: relative;">
                                         <img src="https://img.youtube.com/vi/{{ $vid->youtube_id }}/mqdefault.jpg"
                                             style="width:100%; height:90px; object-fit:cover; border-radius:8px;" alt="">
@@ -490,20 +480,18 @@
                         <p class="warna-light">Belum ada video.</p>
                     </div>
                 @endif
-            </div>
+            </div>{{-- end col kanan --}}
 
-        </div>
+        </div>{{-- end row baris atas --}}
 
         {{-- BARIS BAWAH: Infografis full width --}}
         <div class="row">
             <div class="col-12">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                    <h4 class="warna-hitam mb-0">
-                        <a href="{{ url('/infografis') }}" class="warna-hitam">
-                            Infografis <i class="fas fa-angle-right text-2"></i>
-                        </a>
-                    </h4>
-                </div>
+                <h4 class="warna-hitam mb-3">
+                    <a href="{{ url('/infografis') }}" class="warna-hitam">
+                        Infografis <i class="fas fa-angle-right text-2"></i>
+                    </a>
+                </h4>
                 <div class="owl-carousel owl-theme nav-inside nav-inside-edge nav-squared nav-with-transparency nav-dark"
                     data-plugin-options="{'responsive': {'0': {'items': 1}, '576': {'items': 2}, '768': {'items': 3}, '992': {'items': 4}, '1200': {'items': 5}}, 'margin': 14, 'loop': false, 'nav': true, 'dots': true}">
                     @foreach ($infografis as $info)
@@ -523,12 +511,34 @@
                     @endforeach
                 </div>
             </div>
-        </div>
+        </div>{{-- end row infografis --}}
 
     </div>
 </section>
 
-    </div>
+<script>
+$(document).ready(function() {
+    function scaleFb() {
+        var containerWidth = $('#fbContainer').width();
+        if (!containerWidth) return;
+        var iframeWidth = 500;
+        var scale = containerWidth / iframeWidth;
+        $('#fbIframe').css({
+            'transform': 'scale(' + scale + ')',
+            'height': Math.round(500 / scale) + 'px'
+        });
+        $('#fbContainer').css('height', '500px');
+    }
+
+    scaleFb();
+    $(window).on('resize', scaleFb);
+
+    // Re-scale saat tab Facebook diklik (width = 0 saat tab hidden)
+    $('a[href="#tabFacebook"]').on('shown.bs.tab', function() {
+        scaleFb();
+    });
+});
+</script>
 
     {{-- ═══════════════════════════════════════════
          MODALS
