@@ -18,71 +18,79 @@ class HomeController extends Controller
         return view('depan.menu', $data);
     }
 
-    public function index()
-    {
-        $homeData = Cache::remember('frontend:home:index', 600, function () {
-            return [
-                'sliders' => DB::table('image_slider')
-                    ->where('is_active', 'yes')
-                    ->orderBy('created_at', 'desc')
-                    ->get(),
+public function index()
+{
+    $homeData = Cache::remember('frontend:home:index', 600, function () {
+        return [
+            'sliders' => DB::table('image_slider')
+                ->where('is_active', 'yes')
+                ->orderBy('created_at', 'desc')
+                ->get(),
 
-                'berita' => DB::table('berita')
-                    ->where('id_status_berita', '2')
-                    ->orderBy('tanggal_publikasi', 'desc')
-                    ->limit(6)
-                    ->get(),
+            'berita' => DB::table('berita')
+                ->where('id_status_berita', '2')
+                ->orderBy('tanggal_publikasi', 'desc')
+                ->limit(6)
+                ->get(),
 
-                'ruedp' => DB::table('ruedp')
-                    ->orderBy('urutan', 'asc')
-                    ->get(),
+            'ruedp' => DB::table('ruedp')
+                ->orderBy('urutan', 'asc')
+                ->get(),
 
-                'rued' => DB::table('ruedp')
-                    ->orderBy('urutan', 'asc')
-                    ->first(),
+            'rued' => DB::table('ruedp')
+                ->orderBy('urutan', 'asc')
+                ->first(),
 
-                'prokumden' => DB::table('publikasi')
-                    ->where('id_publikasi_kategori', '1')
-                    ->orderBy('tanggal_publikasi', 'DESC')
-                    ->get(),
+            'prokumden' => DB::table('publikasi')
+                ->where('id_publikasi_kategori', '1')
+                ->orderBy('tanggal_publikasi', 'DESC')
+                ->get(),
 
-                'layananpublik' => DB::table('layanan_publik')
-                    ->orderBy('urutan', 'asc')
-                    ->get(),
+            'layananpublik' => DB::table('layanan_publik')
+                ->orderBy('urutan', 'asc')
+                ->get(),
 
-                'video' => DB::table('galerivideo')
-                    ->orderBy('tanggal_publikasi', 'desc')
-                    ->first(),
+            // Ganti 'video' single → 'videos' collection 3 terbaru
+            'videos' => DB::table('galerivideo')
+                ->whereNotNull('youtube_id')
+                ->where('youtube_id', '!=', '')
+                ->orderBy('tanggal_publikasi', 'desc')
+                ->limit(3)
+                ->get(),
 
-                'infografis' => DB::table('infografis')
-                    ->orderBy('tanggal_publikasi', 'desc')
-                    ->limit(6)
-                    ->get(),
+            'infografis' => DB::table('infografis')
+                ->orderBy('tanggal_publikasi', 'desc')
+                ->limit(8)
+                ->get(),
 
-                'ruedpStatus' => \App\Models\RuedpStatus::withCount('provinsi')
-                    ->orderBy('urutan')
-                    ->get(),
+            // Tambah identitas untuk instagram_embed_url
+            'identitas' => DB::table('identitas_organisasi')
+                ->first(),
 
-                'ruedpMapData' => \App\Models\RuedpProvinsi::with('status')
-                    ->get()
-                    ->map(function ($p) {
-                        return [
-                            'kode' => strtoupper($p->nama_provinsi),
-                            'nama' => $p->nama_provinsi,
-                            'status' => $p->status->nama_status ?? '-',
-                            'warna' => $p->status->warna ?? '#cccccc',
-                            'nomor_perda' => $p->nomor_perda ?? '-',
-                            'tanggal_update' => $p->tanggal_update
-                                ? \Carbon\Carbon::parse($p->tanggal_update)->isoFormat('D MMMM YYYY')
-                                : '-',
-                            'keterangan' => $p->keterangan ?? '-',
-                        ];
-                    }),
-            ];
-        });
+            'ruedpStatus' => \App\Models\RuedpStatus::withCount('provinsi')
+                ->orderBy('urutan')
+                ->get(),
 
-        return view('depan.home', $homeData);
-    }
+            'ruedpMapData' => \App\Models\RuedpProvinsi::with('status')
+                ->get()
+                ->map(function ($p) {
+                    return [
+                        'kode'          => strtoupper($p->nama_provinsi),
+                        'nama'          => $p->nama_provinsi,
+                        'status'        => $p->status->nama_status ?? '-',
+                        'warna'         => $p->status->warna ?? '#cccccc',
+                        'nomor_perda'   => $p->nomor_perda ?? '-',
+                        'tanggal_update'=> $p->tanggal_update
+                            ? \Carbon\Carbon::parse($p->tanggal_update)->isoFormat('D MMMM YYYY')
+                            : '-',
+                        'keterangan'    => $p->keterangan ?? '-',
+                    ];
+                }),
+        ];
+    });
+
+    return view('depan.home', $homeData);
+}
 
     public function profilden($slug)
     {

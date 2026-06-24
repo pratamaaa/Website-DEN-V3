@@ -328,106 +328,205 @@
         {{-- ═══════════════════════════════════════════
              MEDIA & PUBLIKASI
         ═══════════════════════════════════════════ --}}
-        <section class="section section-default border-0 section-center__ bg-white"
-            style="background: url('{{ asset('theme/img/ndr-bg5.jpg') }}'); background-size:cover; background-position: 0 100%; margin: 0px !important;">
-            <div class="container my-5 py-3">
-                <div class="row mt-3 pb-4">
-                    <div class="col text-center">
-                        <h2 class="text-color-dark font-weight-normal text-6 mb-2 pb-1">
-                            <strong class="font-weight-extra-bold">Media</strong>
-                            dan
-                            <strong class="font-weight-extra-bold warna-hijau">Publikasi</strong>
-                        </h2>
-                    </div>
-                </div>
 
-                <div class="row mb-5 pb-3">
-                    {{-- KOLOM 1: Sosial Media --}}
-                    <div class="col-lg-4">
-                        <div class="tabs">
-                            <ul class="nav nav-tabs nav-justified flex-column flex-md-row">
-                                <li class="nav-item">
-                                    <a class="nav-link active" href="#facebook" data-bs-toggle="tab">Facebook</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#instagram" data-bs-toggle="tab">Instagram</a>
-                                </li>
-                            </ul>
-                            <div class="tab-content medsos-tabcontent">
-                                <div id="facebook" class="tab-pane active">
-                                    <div id="fb-root"></div>
-                                    <script async defer crossorigin="anonymous"
-                                        src="https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v13.0"
-                                        nonce="itp0CbFk"></script>
-                                    <iframe title="Facebook Page"
-                                        src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fdewanenerginasional&tabs=timeline&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId=661144383905425&width=326&height=620"
-                                        width="450px" height="575"
-                                        style="width:100%;border:none;overflow:hidden"
-                                        scrolling="no" frameborder="0" allowTransparency="true"></iframe>
-                                </div>
-                                <div id="instagram" class="tab-pane">
-    <blockquote class="instagram-media" data-instgrm-captioned
-        data-instgrm-permalink="https://www.instagram.com/p/DZ3xqy7kxAj/?utm_source=ig_embed&amp;utm_campaign=loading"
-        data-instgrm-version="14"
-        style="background:#FFF;border:0;border-radius:3px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:1px;max-width:540px;min-width:326px;padding:0;width:99.375%;">
-    </blockquote>
-    <script async src="//www.instagram.com/embed.js"></script>
-</div>
-                            </div>
-                        </div>
-                    </div>
+<section class="section section-default border-0 section-center__ bg-white"
+    style="background: url('{{ asset('theme/img/ndr-bg5.jpg') }}'); background-size:cover; background-position: 0 100%; margin: 0px !important;">
+    <div class="container my-5 py-3">
 
-                    {{-- KOLOM 2: Video + Infografis --}}
-                    <div class="col-lg-4">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <a href="{{ url('/video') }}">
-                                    <h4 class="warna-hitam">Video</h4>
-                                </a>
-                                <div class="ratio ratio-16x9">
-                                    <iframe class="kotakku" frameborder="0" allowfullscreen=""
-                                        src="//www.youtube.com/embed/{{ $video->kode_video ?? 'RhwW7U44Yr4' }}?showinfo=0&amp;wmode=opaque"></iframe>
-                                </div>
-                                <p class="text-2 mb-0 mt-2 lineheight-17 ratatengah warna-putih">{{ $video->judul }}</p>
-                            </div>
+        <div class="row mt-3 pb-4">
+            <div class="col text-center">
+                <h2 class="text-color-dark font-weight-normal text-6 mb-2 pb-1">
+                    <strong class="font-weight-extra-bold">Media</strong>
+                    dan
+                    <strong class="font-weight-extra-bold warna-hijau">Publikasi</strong>
+                </h2>
+            </div>
+        </div>
+
+        {{-- BARIS ATAS: Sosial Media | Video --}}
+        <div class="row mb-4">
+
+            {{-- KOLOM KIRI: Sosial Media tabs --}}
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="tabs tabs-dark h-100">
+                    <ul class="nav nav-tabs nav-justified">
+                        <li class="nav-item">
+                            <a class="nav-link active text-1 font-weight-bold" href="#tabFacebook" data-bs-toggle="tab">
+                                <i class="fab fa-facebook-f me-1"></i> Facebook
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-1 font-weight-bold" href="#tabInstagram" data-bs-toggle="tab">
+                                <i class="fab fa-instagram me-1"></i> Instagram
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-1 font-weight-bold" href="#tabYoutube" data-bs-toggle="tab">
+                                <i class="fab fa-youtube me-1"></i> YouTube
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" style="min-height: 400px;">
+
+                        {{-- Facebook --}}
+                        <div id="tabFacebook" class="tab-pane active pt-3">
+                            <iframe title="Facebook Page"
+                                src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fdewanenerginasional&tabs=timeline&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId=661144383905425&height=400"
+                                width="100%" height="400"
+                                style="border:none;overflow:hidden;border-radius:8px;"
+                                scrolling="no" frameborder="0" allowTransparency="true">
+                            </iframe>
                         </div>
-                        <div class="row mt-4">
-                            <div class="col-md-12">
-                                <a href="{{ url('/infografis') }}">
-                                    <h4 class="ratakiri warna-hitam">Infografis</h4>
-                                </a>
-                                <div class="owl-carousel owl-theme nav-inside nav-inside-edge nav-squared nav-with-transparency nav-dark"
-                                    data-plugin-options="{'items': 1, 'margin': 10, 'loop': false, 'nav': true, 'dots': false}">
-                                    @foreach ($infografis as $info)
-                                        <div>
-                                            <a class="lightbox"
-                                                href="{{ asset('storage/infografis/' . $info->gambar_sampul) }}"
-                                                data-plugin-options="{'type':'image'}">
-                                                <img src="{{ asset('storage/infografis/' . $info->gambar_sampul) }}"
-                                                    class="img-fluid rounded-0 mb-2 kotakku"
-                                                    style="min-height:280px; object-fit:cover;" alt="">
-                                            </a>
-                                            <p class="text-2 mb-0 mt-2 lineheight-17 ratatengah warna-putih">
-                                                {{ $info->judul_infografis }}
-                                            </p>
-                                        </div>
+
+                        {{-- Instagram --}}
+                        <div id="tabInstagram" class="tab-pane pt-3">
+                            @if ($identitas && $identitas->instagram_embed_url)
+                                <blockquote class="instagram-media" data-instgrm-captioned
+                                    data-instgrm-permalink="{{ $identitas->instagram_embed_url }}"
+                                    data-instgrm-version="14"
+                                    style="background:#FFF;border:0;border-radius:8px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:0;width:100%;">
+                                </blockquote>
+                                <script async src="//www.instagram.com/embed.js"></script>
+                            @else
+                                <div class="text-center py-5">
+                                    <p class="warna-light">Belum ada postingan Instagram yang ditampilkan.</p>
+                                    <a href="{{ url('/dap/identitasorganisasi') }}" class="btn btn-sm btn-outline-success">
+                                        Setting di Admin Panel
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
+
+                        {{-- YouTube --}}
+                        <div id="tabYoutube" class="tab-pane pt-3">
+                            @if ($identitas && $identitas->youtube)
+                                <div class="text-center mb-3">
+                                    <a href="{{ $identitas->youtube }}" target="_blank"
+                                        class="btn btn-sm btn-danger">
+                                        <i class="fab fa-youtube me-1"></i> Kunjungi Channel YouTube
+                                    </a>
+                                </div>
+                            @endif
+                            @if ($videos->count() > 0)
+                                <div style="display: flex; flex-direction: column; gap: 12px;">
+                                    @foreach ($videos as $vid)
+                                        <a href="https://www.youtube.com/watch?v={{ $vid->youtube_id }}"
+                                            target="_blank"
+                                            style="display: flex; gap: 12px; align-items: flex-start; text-decoration: none; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 10px; transition: background 0.2s;"
+                                            onmouseover="this.style.background='rgba(255,255,255,0.1)'"
+                                            onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                                            <div style="position: relative; flex-shrink: 0; width: 120px;">
+                                                <img src="https://img.youtube.com/vi/{{ $vid->youtube_id }}/mqdefault.jpg"
+                                                    style="width:120px; height:68px; object-fit:cover; border-radius:6px;" alt="">
+                                                <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+                                                    <div style="width:28px; height:28px; background:rgba(255,0,0,0.85); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                                        <div style="border-left:10px solid #fff; border-top:6px solid transparent; border-bottom:6px solid transparent; margin-left:3px;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style="flex: 1;">
+                                                <p style="font-size: 12px; font-weight: bold; color: rgba(255,255,255,0.9); margin: 0 0 4px; line-height: 1.4;">
+                                                    {{ Str::limit($vid->judul, 70) }}
+                                                </p>
+                                                <p style="font-size: 11px; color: rgba(255,255,255,0.45); margin: 0;">
+                                                    <i class="fa fa-calendar me-1"></i>
+                                                    {{ App\Helpers\Gudangfungsi::tanggalindoshort($vid->tanggal_publikasi) }}
+                                                </p>
+                                            </div>
+                                        </a>
                                     @endforeach
                                 </div>
-                            </div>
+                            @else
+                                <div class="text-center py-4">
+                                    <p class="warna-light">Belum ada video yang ditampilkan.</p>
+                                </div>
+                            @endif
                         </div>
-                    </div>
 
-                    {{-- KOLOM 3: GPR Kominfo --}}
-                    <div class="col-lg-4">
-                        <h4 class="ratakiri warna-hitam">GPR Kominfo</h4>
-                        <div class="featured-box featured-box-primary featured-box-effect-1"
-                            style="background-color: #F4F4F6;">
-                            <div class="box-content box-content-border-0 p-5"></div>
-                        </div>
                     </div>
                 </div>
             </div>
-        </section>
+
+            {{-- KOLOM KANAN: Video featured (thumbnail besar pertama) --}}
+            <div class="col-lg-6">
+                <h4 class="ratakiri warna-hitam mb-3">
+                    <a href="{{ url('/video') }}" class="warna-hitam">
+                        Video <i class="fas fa-angle-right text-2"></i>
+                    </a>
+                </h4>
+                @if ($videos->count() > 0)
+                    @php $featuredVideo = $videos->first(); @endphp
+                    <div class="ratio ratio-16x9 mb-3" style="border-radius: 10px; overflow: hidden;">
+                        <iframe
+                            src="https://www.youtube.com/embed/{{ $featuredVideo->youtube_id }}?showinfo=0&wmode=opaque"
+                            frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <p class="text-2 mb-0 lineheight-17 warna-putih font-weight-bold">
+                        {{ Str::limit($featuredVideo->judul, 100) }}
+                    </p>
+                    @if ($videos->count() > 1)
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px;">
+                            @foreach ($videos->skip(1) as $vid)
+                                <a href="https://www.youtube.com/watch?v={{ $vid->youtube_id }}" target="_blank"
+                                    style="text-decoration: none;">
+                                    <div style="position: relative;">
+                                        <img src="https://img.youtube.com/vi/{{ $vid->youtube_id }}/mqdefault.jpg"
+                                            style="width:100%; height:90px; object-fit:cover; border-radius:8px;" alt="">
+                                        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+                                            <div style="width:28px; height:28px; background:rgba(255,0,0,0.85); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                                <div style="border-left:10px solid #fff; border-top:6px solid transparent; border-bottom:6px solid transparent; margin-left:3px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p style="font-size:11px; color:rgba(255,255,255,0.7); margin: 6px 0 0; line-height:1.3;">
+                                        {{ Str::limit($vid->judul, 55) }}
+                                    </p>
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
+                @else
+                    <div class="text-center py-4">
+                        <p class="warna-light">Belum ada video.</p>
+                    </div>
+                @endif
+            </div>
+
+        </div>
+
+        {{-- BARIS BAWAH: Infografis full width --}}
+        <div class="row">
+            <div class="col-12">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                    <h4 class="warna-hitam mb-0">
+                        <a href="{{ url('/infografis') }}" class="warna-hitam">
+                            Infografis <i class="fas fa-angle-right text-2"></i>
+                        </a>
+                    </h4>
+                </div>
+                <div class="owl-carousel owl-theme nav-inside nav-inside-edge nav-squared nav-with-transparency nav-dark"
+                    data-plugin-options="{'responsive': {'0': {'items': 1}, '576': {'items': 2}, '768': {'items': 3}, '992': {'items': 4}, '1200': {'items': 5}}, 'margin': 14, 'loop': false, 'nav': true, 'dots': true}">
+                    @foreach ($infografis as $info)
+                        <div>
+                            <a class="lightbox"
+                                href="{{ asset('storage/infografis/' . $info->gambar_sampul) }}"
+                                data-plugin-options="{'type':'image'}">
+                                <img src="{{ asset('storage/infografis/' . $info->gambar_sampul) }}"
+                                    class="img-fluid rounded mb-2"
+                                    style="width:100%; aspect-ratio: 3/4; object-fit:cover; border:1px solid rgba(255,255,255,0.1);"
+                                    alt="{{ $info->judul_infografis }}">
+                            </a>
+                            <p class="text-2 mb-0 mt-1 lineheight-17 ratatengah warna-putih">
+                                {{ Str::limit($info->judul_infografis, 60) }}
+                            </p>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
 
     </div>
 
