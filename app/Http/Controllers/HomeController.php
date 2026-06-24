@@ -30,7 +30,7 @@ public function index()
             'berita' => DB::table('berita')
                 ->where('id_status_berita', '2')
                 ->orderBy('tanggal_publikasi', 'desc')
-                ->limit(6)
+                ->limit(4)
                 ->get(),
 
             'ruedp' => DB::table('ruedp')
