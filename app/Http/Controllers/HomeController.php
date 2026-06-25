@@ -55,7 +55,7 @@ public function index()
                 ->whereNotNull('youtube_id')
                 ->where('youtube_id', '!=', '')
                 ->orderBy('tanggal_publikasi', 'desc')
-                ->limit(6)
+                ->limit(4)
                 ->get(),
 
             'infografis' => DB::table('infografis')
@@ -270,7 +270,7 @@ public function index()
     public function video()
     {
         $data['judulhalaman'] = 'Video';
-        $data['video'] = DB::table('galerivideo')->orderBy('created_at', 'desc')->paginate(6);
+        $data['video'] = DB::table('galerivideo')->orderBy('created_at', 'desc')->paginate(4);
 
         return view('depan.video', $data);
     }

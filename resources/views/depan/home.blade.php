@@ -359,11 +359,6 @@
                                 <i class="fab fa-instagram me-1"></i> Instagram
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-1 font-weight-bold" href="#tabYoutube" data-bs-toggle="tab">
-                                <i class="fab fa-youtube me-1"></i> YouTube
-                            </a>
-                        </li>
                     </ul>
 
                     <div class="tab-content" style="min-height: 500px;">
@@ -395,43 +390,6 @@
                                 </div>
                             @endif
                         </div>
-
-                        {{-- TAB YOUTUBE --}}
-                        <div id="tabYoutube" class="tab-pane pt-3">
-                            @if ($identitas && $identitas->youtube)
-                                <div class="text-center mb-3">
-                                    <a href="{{ $identitas->youtube }}" target="_blank" class="btn btn-sm btn-danger">
-                                        <i class="fab fa-youtube me-1"></i> Kunjungi Channel YouTube
-                                    </a>
-                                </div>
-                            @endif
-                            @if ($videos->count() > 0)
-                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
-                                    @foreach ($videos as $vid)
-                                        <a href="https://www.youtube.com/watch?v={{ $vid->youtube_id }}"
-                                            target="_blank" style="text-decoration: none; display: block;">
-                                            <div style="position: relative; margin-bottom: 8px;">
-                                                <img src="https://img.youtube.com/vi/{{ $vid->youtube_id }}/mqdefault.jpg"
-                                                    style="width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:8px;" alt="">
-                                                <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
-                                                    <div style="width:40px; height:40px; background:rgba(255,0,0,0.9); border-radius:50%; display:flex; align-items:center; justify-content:center;">
-                                                        <div style="border-left:14px solid #fff; border-top:8px solid transparent; border-bottom:8px solid transparent; margin-left:4px;"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <p style="font-size:11px; color:rgba(255,255,255,0.75); margin:0; line-height:1.4; text-align:center;">
-                                                {{ Str::limit($vid->judul, 50) }}
-                                            </p>
-                                        </a>
-                                    @endforeach
-                                </div>
-                            @else
-                                <div class="text-center py-4">
-                                    <p class="warna-light">Belum ada video.</p>
-                                </div>
-                            @endif
-                        </div>
-
                     </div>{{-- end tab-content --}}
                 </div>{{-- end tabs --}}
             </div>{{-- end col kiri --}}
