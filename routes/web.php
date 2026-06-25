@@ -13,7 +13,12 @@ use Illuminate\Support\Facades\Route;
 Route::controller(HomeController::class)->group(function () {
 
     Route::get('/', 'index');
-    Route::get('/survey/{uuid}', [KuesionerController::class, 'survey'])->name('survey');
+    Route::prefix('survey')->controller(\App\Http\Controllers\SurveyController::class)->group(function () {
+    Route::get('/', 'index');
+    Route::post('/save', 'save');
+    Route::get('/success', 'success')->name('survey.success');
+    Route::get('/{uuid}', 'create')->name('survey');
+});
     Route::get('/berita', 'berita');
     Route::get('/berita/{slug}', 'berita_baca');
     Route::get('/berita-kategori/{cat}', 'berita_kategori');
