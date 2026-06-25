@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 - Halaman Tidak Ditemukan | DEN</title>
+    <link rel="shortcut icon" href="{{ asset('theme/img/logo/den.png') }}" />
     <style>
         * {
             margin: 0;
@@ -37,11 +38,10 @@
         .error-bg {
             position: fixed;
             inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-            z-index: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: contain;
+            background: #f4f7fb;
         }
 
         /* Overlay tipis supaya tombol tetap terbaca */
@@ -132,7 +132,7 @@
 
 <body>
 
-    <img src="/theme/img/error-404.png" alt="404" class="error-bg">
+    <img src="{{ asset('theme/img/error-404.png') }}" alt="404" class="error-bg">
     <div class="error-overlay"></div>
 
     <div class="error-actions">
