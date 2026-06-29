@@ -30,8 +30,18 @@ class GalerivideoController extends Controller
                 return '<p class="ndrparagraf">'.$row->deskripsi.'</p>';
             })
             ->addColumn('youtube', function ($row) {
-                return '<iframe class="kotakku" frameborder="0" allowfullscreen="" src="//www.youtube.com/embed/'.$row->youtube_id.'?showinfo=0&amp;wmode=opaque"></iframe>';
-            })
+    return '
+        <a href="https://www.youtube.com/watch?v='.$row->youtube_id.'" target="_blank"
+            style="display:block; position:relative; width:160px;">
+            <img src="https://img.youtube.com/vi/'.$row->youtube_id.'/mqdefault.jpg"
+                style="width:160px; height:90px; object-fit:cover; border-radius:6px;">
+            <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+                <div style="width:36px; height:36px; background:rgba(255,0,0,0.9); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                    <div style="border-left:12px solid #fff; border-top:7px solid transparent; border-bottom:7px solid transparent; margin-left:3px;"></div>
+                </div>
+            </div>
+        </a>';
+})
             ->addColumn('berkas', function ($row) {
                 return $row->file
                     ? '<a href="#"><i class="feather icon-download-cloud"></i></a>'
