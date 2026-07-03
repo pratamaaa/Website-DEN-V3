@@ -273,26 +273,38 @@
                   </div>
 
                   {{-- 4. PEMDA --}}
-<div class="row pemda" style="display:none">
+                  <div class="row pemda" style="display:none">
+                     <div class="form-group col">
+                        <label class="form-label">Pemerintah Daerah / Provinsi</label>
+
+                        <div class="custom-select-1">
+                              <select
+                                 class="form-select form-control h-auto py-2"
+                                 name="kuesioner_responden_pemda_uuid"
+                                 id="kuesioner_responden_pemda_uuid">
+
+                                 <option value="">- Pilih Provinsi -</option>
+
+                                 @foreach($ref_pemda as $pemda)
+                                    <option value="{{ $pemda->referensi_uuid }}">
+                                          {{ $pemda->referensi_nama }}
+                                    </option>
+                                 @endforeach
+
+                              </select>
+                        </div>
+                     </div>
+                  </div>
+
+                  {{-- 5. LAINNYA (Isian Bebas) --}}
+<div class="row lainnya" style="display:none">
     <div class="form-group col">
-        <label class="form-label">Pemerintah Daerah / Provinsi</label>
-
-        <div class="custom-select-1">
-            <select
-                class="form-select form-control h-auto py-2"
-                name="kuesioner_responden_pemda_uuid"
-                id="kuesioner_responden_pemda_uuid">
-
-                <option value="">- Pilih Provinsi -</option>
-
-                @foreach($ref_pemda as $pemda)
-                    <option value="{{ $pemda->referensi_uuid }}">
-                        {{ $pemda->referensi_nama }}
-                    </option>
-                @endforeach
-
-            </select>
-        </div>
+        <label class="form-label">Sebutkan Asal Instansi/Organisasi Anda</label>
+        <input type="text" class="form-control h-auto py-2"
+               name="kuesioner_responden_instansi_asal_lainnya"
+               id="kuesioner_responden_instansi_asal_lainnya"
+               maxlength="255"
+               placeholder="Contoh: PT ABC / Universitas XYZ / Yayasan ABC">
     </div>
 </div>
                </div>
@@ -435,11 +447,13 @@
    <script>
 
       function setInstansi(ini) {
-   var labelText = $(ini).find(':selected').data('label');
+   var labelText = $(ini).find(':selected').data('label') || '';
 
+   // Reset semua blok kondisional
    $('.apk').hide().find('select').removeAttr('required');
    $('.ap').hide().find('select').removeAttr('required');
    $('.pemda').hide().find('select').removeAttr('required');
+   $('.lainnya').hide().find('input').removeAttr('required');
 
    if (labelText == 'Anggota Pemangku Kepentingan (APK) DEN') {
       $('.apk').show().find('select').attr('required', 'required');
@@ -447,6 +461,8 @@
       $('.ap').show().find('select').attr('required', 'required');
    } else if (labelText == 'Pemerintah Daerah / Provinsi') {
       $('.pemda').show().find('select').attr('required', 'required');
+   } else if (labelText.indexOf('Lainnya') === 0) {
+      $('.lainnya').show().find('input').attr('required', 'required');
    }
 }
 

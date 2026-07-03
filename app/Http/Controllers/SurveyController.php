@@ -137,6 +137,9 @@ class SurveyController extends Controller
                     
                         'kuesioner_responden_pemda_uuid'
         => $request->kuesioner_responden_pemda_uuid,
+
+        'kuesioner_responden_instansi_asal_lainnya' 
+    => $request->kuesioner_responden_instansi_asal_lainnya,
                     // Kolom teks lama boleh dikosongkan atau dihapus dari create
                     // 'kuesioner_responden_instansi_asal' => ..., (HAPUS)
                     
