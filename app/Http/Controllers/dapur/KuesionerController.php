@@ -132,6 +132,20 @@ class KuesionerController extends Controller
         $data['chart_ap_label'] = $apStats->pluck('referensi_nama');
         $data['chart_ap_data'] = $apStats->pluck('total');
 
+        // 4b. Data Chart: Detail Pemda (Provinsi)
+$pemdaStats = DB::table('kuesioner_referensi as ref')
+    ->leftJoin('kuesioner_responden as resp', 'ref.referensi_uuid', '=', 'resp.kuesioner_responden_pemda_uuid')
+    ->select('ref.referensi_nama', DB::raw('COUNT(resp.kuesioner_responden_uuid) as total'))
+    ->where('ref.referensi_kategori', 'PEMDA')
+    ->where('ref.referensi_status', 1)
+    ->groupBy('ref.referensi_nama', 'ref.referensi_urutan')
+    ->orderBy('ref.referensi_urutan', 'asc')
+    ->get();
+
+$data['chart_pemda_label'] = $pemdaStats->pluck('referensi_nama');
+$data['chart_pemda_data']  = $pemdaStats->pluck('total');
+$data['total_pemda_responden'] = $pemdaStats->sum('total');
+
         // 5. Data Tabel
         $layananStats = DB::table('kuesioner_layanan as l')
             ->leftJoin('kuesioner_responden as r', 'l.kuesioner_layanan_uuid', '=', 'r.kuesioner_layanan_uuid')
