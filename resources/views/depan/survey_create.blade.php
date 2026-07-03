@@ -272,6 +272,29 @@
                      </div>
                   </div>
 
+                  {{-- 4. PEMDA --}}
+<div class="row pemda" style="display:none">
+    <div class="form-group col">
+        <label class="form-label">Pemerintah Daerah / Provinsi</label>
+
+        <div class="custom-select-1">
+            <select
+                class="form-select form-control h-auto py-2"
+                name="kuesioner_responden_pemda_uuid"
+                id="kuesioner_responden_pemda_uuid">
+
+                <option value="">- Pilih Provinsi -</option>
+
+                @foreach($ref_pemda as $pemda)
+                    <option value="{{ $pemda->referensi_uuid }}">
+                        {{ $pemda->referensi_nama }}
+                    </option>
+                @endforeach
+
+            </select>
+        </div>
+    </div>
+</div>
                </div>
 
                {{-- STEP 1 dst: Pertanyaan Survei --}}
@@ -409,28 +432,23 @@
 
    </div>
 
-   {{-- Asumsi Anda sudah memuat jQuery di layout utama, jika belum, tambahkan di sini --}}
-   {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
-
    <script>
-      // ---------------------------------------------------
-      // FUNGSI BLOK KONDISIONAL
-      // ---------------------------------------------------
+
       function setInstansi(ini) {
-         // Kita ambil atribut 'data-label' dari option yang dipilih, BUKAN value-nya (karena value isinya UUID)
-         var labelText = $(ini).find(':selected').data('label');
+   var labelText = $(ini).find(':selected').data('label');
 
-         // Reset
-         $('.apk').hide().find('select').removeAttr('required');
-         $('.ap').hide().find('select').removeAttr('required');
+   $('.apk').hide().find('select').removeAttr('required');
+   $('.ap').hide().find('select').removeAttr('required');
+   $('.pemda').hide().find('select').removeAttr('required');
 
-         // Logic tetap sama, membandingkan Teks Label
-         if (labelText == 'Anggota Pemangku Kepentingan (APK) DEN') {
-            $('.apk').show().find('select').attr('required', 'required');
-         } else if (labelText == 'Anggota Pemerintah (AP) DEN / Kementerian') {
-            $('.ap').show().find('select').attr('required', 'required');
-         }
-      }
+   if (labelText == 'Anggota Pemangku Kepentingan (APK) DEN') {
+      $('.apk').show().find('select').attr('required', 'required');
+   } else if (labelText == 'Anggota Pemerintah (AP) DEN / Kementerian') {
+      $('.ap').show().find('select').attr('required', 'required');
+   } else if (labelText == 'Pemerintah Daerah / Provinsi') {
+      $('.pemda').show().find('select').attr('required', 'required');
+   }
+}
 
 
       // ---------------------------------------------------

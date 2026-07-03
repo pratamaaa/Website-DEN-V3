@@ -69,12 +69,18 @@ class SurveyController extends Controller
                                 ->orderBy('referensi_urutan', 'asc')
                                 ->get();
 
+        $data['ref_pemda'] = KuesionerReferensi::where('referensi_kategori', 'PEMDA')
+    ->where('referensi_status', 1)
+    ->orderBy('referensi_urutan', 'asc')
+    ->get();
+
         $data['judulhalaman'] = 'Reformasi Birokrasi';
         $data['layanan'] = $layanan;
         $data['templateGroups'] = $templateGroups;
         $data['pertanyaan'] = $pertanyaan;
         $data['totalPertanyaan'] = $pertanyaan->sum(fn($p) => $p->children->count());
 
+        // dd($data['ref_instansi']);
         return view('depan.survey_create', $data);
     }
 
@@ -129,6 +135,8 @@ class SurveyController extends Controller
                     'kuesioner_responden_kementerian_lembaga_uuid' 
                         => $request->kuesioner_responden_kementerian_lembaga_uuid,
                     
+                        'kuesioner_responden_pemda_uuid'
+        => $request->kuesioner_responden_pemda_uuid,
                     // Kolom teks lama boleh dikosongkan atau dihapus dari create
                     // 'kuesioner_responden_instansi_asal' => ..., (HAPUS)
                     
