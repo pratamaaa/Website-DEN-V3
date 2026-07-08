@@ -148,9 +148,26 @@
                         <div class="res-info-value">{{ $responden->instansi_asal ?? '-' }}</div>
 
                         @if ($responden->pemangku_kepentingan)
-                           <div class="res-info-label">Pemangku Kepentingan</div>
-                           <div class="res-info-value">{{ $responden->pemangku_kepentingan }}</div>
-                        @endif
+   <div class="res-info-label">Pemangku Kepentingan</div>
+   <div class="res-info-value">{{ $responden->pemangku_kepentingan }}</div>
+@endif
+
+@if ($responden->kementerian_lembaga)
+   <div class="res-info-label">Kementerian / Lembaga</div>
+   <div class="res-info-value">{{ $responden->kementerian_lembaga }}</div>
+@endif
+
+@if ($responden->pemda_provinsi)
+   <div class="res-info-label">Provinsi</div>
+   <div class="res-info-value">{{ $responden->pemda_provinsi }}</div>
+@endif
+
+@if ($responden->kuesioner_responden_instansi_asal_lainnya)
+   <div class="res-info-label">Keterangan Instansi Lainnya</div>
+   <div class="res-info-value">{{ $responden->kuesioner_responden_instansi_asal_lainnya }}</div>
+@endif
+
+<div class="res-info-label">Waktu Pengisian</div>
 
                         <div class="res-info-label">Waktu Pengisian</div>
                         <div class="res-info-value">{{ date('d/m/Y H:i', strtotime($responden->kuesioner_responden_created_date)) }}</div>
