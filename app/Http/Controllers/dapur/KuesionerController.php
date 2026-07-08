@@ -333,6 +333,34 @@ $data['total_pemda_responden'] = $pemdaStats->sum('total');
         return view('dapur.kuesioner.data_responden.detail', $data);
     }
 
+    public function data_responden_delete($uuid)
+{
+    DB::beginTransaction();
+    try {
+        // Cek dulu datanya ada
+        $responden = DB::table('kuesioner_responden')->where('kuesioner_responden_uuid', $uuid)->first();
+        if (!$responden) {
+            return response()->json(['result' => 'failed', 'message' => 'Data responden tidak ditemukan.']);
+        }
+
+        // Hapus jawaban terkait dulu (child)
+        DB::table('kuesioner_jawaban_responden')
+            ->where('kuesioner_responden_uuid', $uuid)
+            ->delete();
+
+        // Hapus data responden (parent)
+        DB::table('kuesioner_responden')
+            ->where('kuesioner_responden_uuid', $uuid)
+            ->delete();
+
+        DB::commit();
+        return response()->json(['result' => 'success', 'message' => 'Data responden berhasil dihapus.']);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json(['result' => 'failed', 'message' => 'Gagal menghapus: ' . $e->getMessage()]);
+    }
+}
+
     public function hasil_analisa_list(Request $request)
     {
         // --- BAGIAN 1: QUERY DATA MATRIKS (INPUT/GAP) ---

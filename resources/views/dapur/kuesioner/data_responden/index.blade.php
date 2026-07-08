@@ -20,7 +20,12 @@
             width: 100%;
             border-collapse: collapse;
         }
-
+.btn-detail-resp {
+    padding: 2px 8px;
+    font-size: 10px;
+    margin-top: 5px;
+    margin-right: 3px;
+}
         .table th {
             text-align: center;
             vertical-align: middle;
@@ -161,6 +166,28 @@
             );
         });
 
+        function hapusResponden(uuid, nama) {
+    if (!confirm('Yakin mau hapus data responden "' + nama + '"? Semua jawaban terkait juga akan terhapus dan tidak bisa dikembalikan.')) {
+        return;
+    }
+
+    $.ajax({
+        url: "{{ url('/kuesioner/data-responden-delete') }}/" + uuid,
+        type: "POST",
+        success: function(response) {
+            if (response.result === 'success') {
+                alert(response.message);
+                loadTable(); // Reload tabel biar kolom yang dihapus hilang
+            } else {
+                alert('Gagal: ' + response.message);
+            }
+        },
+        error: function() {
+            alert('Terjadi kesalahan saat menghapus data.');
+        }
+    });
+}
+
         function loadTable() {
             var layananId = $('#filter_layanan').val();
             if (!layananId) {
@@ -199,12 +226,13 @@
             theadHtml += '<th width="90px">Aspek</th>';
 
             headers.forEach(function(h) {
-                theadHtml += `
-                <th class="th-responden">
-                    <div>${h.nama}</div>
-                    <a href="{{ url('/kuesioner/data-responden-detail') }}/${h.uuid}" class="btn btn-info btn-detail-resp shadow-sm">Detail</a>
-                </th>`;
-            });
+    theadHtml += `
+    <th class="th-responden">
+        <div>${h.nama}</div>
+        <a href="{{ url('/kuesioner/data-responden-detail') }}/${h.uuid}" class="btn btn-info btn-detail-resp shadow-sm">Detail</a>
+        <button type="button" class="btn btn-danger btn-detail-resp shadow-sm" onclick="hapusResponden('${h.uuid}', '${h.nama.replace(/'/g, "\\'")}')">Hapus</button>
+    </th>`;
+});
 
             theadHtml += '<th class="bg-light" width="80px">Rata-Rata</th></tr></thead>';
 

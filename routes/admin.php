@@ -167,6 +167,7 @@ Route::middleware(['auth', MfaMiddleware::class])->group(function () {
             Route::get('/data-responden', 'data_responden')->name('kuesioner.responden');
             Route::get('/data-responden-list', 'data_responden_list')->name('kuesioner.responden.list');
             Route::get('/data-responden-detail/{uuid}', 'data_responden_detail')->name('kuesioner.responden.detail');
+            Route::post('/data-responden-delete/{uuid}', 'data_responden_delete')->name('kuesioner.responden.delete');
 
             // Hasil Analisa
             Route::get('/hasil-analisa', 'hasil_analisa')->name('kuesioner.analisa');
