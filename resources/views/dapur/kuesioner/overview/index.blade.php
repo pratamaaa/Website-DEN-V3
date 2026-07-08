@@ -246,10 +246,13 @@
                             </div>
                         </div>
                         <div class="ov-card-body">
-                            <div style="height: 480px;">
-                                <canvas id="chartPemda"></canvas>
-                            </div>
-                        </div>
+    @php
+        $pemdaHeight = max(480, count($chart_pemda_label) * 26);
+    @endphp
+    <div style="height: {{ $pemdaHeight }}px;">
+        <canvas id="chartPemda"></canvas>
+    </div>
+</div>
                     </div>
                 </div>
             </div>
@@ -403,29 +406,32 @@
 
             // 4. BAR HORIZONTAL (Pemda / Provinsi) - BARU
             new Chart(document.getElementById('chartPemda'), {
-                type: 'bar',
-                data: {
-                    labels: dataPemdaLabel,
-                    datasets: [{
-                        label: 'Responden',
-                        data: dataPemdaVal,
-                        backgroundColor: '#7c5cff',
-                        borderRadius: 4,
-                        barPercentage: 0.7,
-                        categoryPercentage: 0.8
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { borderDash: [2, 2] } },
-                        y: { grid: { display: false } }
-                    }
-                }
-            });
+    type: 'bar',
+    data: {
+        labels: dataPemdaLabel,
+        datasets: [{
+            label: 'Responden',
+            data: dataPemdaVal,
+            backgroundColor: '#7c5cff',
+            borderRadius: 4,
+            barPercentage: 0.7,
+            categoryPercentage: 0.8
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { borderDash: [2, 2] } },
+            y: {
+                grid: { display: false },
+                ticks: { font: { size: 11 } } // font label provinsi sedikit lebih kecil
+            }
+        }
+    }
+});
         });
     </script>
 @endsection

@@ -293,19 +293,21 @@ $data['total_pemda_responden'] = $pemdaStats->sum('total');
 
         // 1. Ambil Profil Responden
         $data['responden'] = DB::table('kuesioner_responden as r')
-            ->join('kuesioner_layanan as l', 'r.kuesioner_layanan_uuid', '=', 'l.kuesioner_layanan_uuid')
-            ->leftJoin('kuesioner_referensi as ref1', 'r.kuesioner_responden_instansi_asal_uuid', '=', 'ref1.referensi_uuid')
-            ->leftJoin('kuesioner_referensi as ref2', 'r.kuesioner_responden_pemangku_kepentingan_uuid', '=', 'ref2.referensi_uuid')
-            ->leftJoin('kuesioner_referensi as ref3', 'r.kuesioner_responden_kementerian_lembaga_uuid', '=', 'ref3.referensi_uuid')
-            ->select(
-                'r.*',
-                'l.kuesioner_layanan_nama',
-                'ref1.referensi_nama as instansi_asal',
-                'ref2.referensi_nama as pemangku_kepentingan',
-                'ref3.referensi_nama as kementerian_lembaga'
-            )
-            ->where('r.kuesioner_responden_uuid', $uuid)
-            ->first();
+    ->join('kuesioner_layanan as l', 'r.kuesioner_layanan_uuid', '=', 'l.kuesioner_layanan_uuid')
+    ->leftJoin('kuesioner_referensi as ref1', 'r.kuesioner_responden_instansi_asal_uuid', '=', 'ref1.referensi_uuid')
+    ->leftJoin('kuesioner_referensi as ref2', 'r.kuesioner_responden_pemangku_kepentingan_uuid', '=', 'ref2.referensi_uuid')
+    ->leftJoin('kuesioner_referensi as ref3', 'r.kuesioner_responden_kementerian_lembaga_uuid', '=', 'ref3.referensi_uuid')
+    ->leftJoin('kuesioner_referensi as ref4', 'r.kuesioner_responden_pemda_uuid', '=', 'ref4.referensi_uuid')
+    ->select(
+        'r.*',
+        'l.kuesioner_layanan_nama',
+        'ref1.referensi_nama as instansi_asal',
+        'ref2.referensi_nama as pemangku_kepentingan',
+        'ref3.referensi_nama as kementerian_lembaga',
+        'ref4.referensi_nama as pemda_provinsi'
+    )
+    ->where('r.kuesioner_responden_uuid', $uuid)
+    ->first();
 
         if (! $data['responden']) {
             return redirect()->back()->with('error', 'Data responden tidak ditemukan.');
