@@ -23,9 +23,11 @@ class KuesionerResponden extends Model
         'kuesioner_responden_pemangku_kepentingan',
         'kuesioner_responden_kementerian_lembaga',
         'kuesioner_responden_instansi_asal_uuid',       // <--- Baru
-        'kuesioner_responden_pemangku_kepentingan_uuid', // <--- Baru
-        'kuesioner_responden_kementerian_lembaga_uuid',  // <--- Baru
-        'kuesioner_responden_saran',
+'kuesioner_responden_pemangku_kepentingan_uuid', // <--- Baru
+'kuesioner_responden_kementerian_lembaga_uuid',  // <--- Baru
+'kuesioner_responden_pemda_uuid',                // <--- Baru
+'kuesioner_responden_instansi_asal_lainnya',     // <--- Baru (buat fitur "Lainnya" kemarin)
+'kuesioner_responden_saran',
         'kuesioner_responden_created_by',
         'kuesioner_responden_created_date',
         'kuesioner_responden_update_by',
