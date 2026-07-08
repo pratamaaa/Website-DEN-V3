@@ -168,9 +168,7 @@
 @endif
 
 <div class="res-info-label">Waktu Pengisian</div>
-
-                        <div class="res-info-label">Waktu Pengisian</div>
-                        <div class="res-info-value">{{ date('d/m/Y H:i', strtotime($responden->kuesioner_responden_created_date)) }}</div>
+<div class="res-info-value">{{ date('d/m/Y H:i', strtotime($responden->kuesioner_responden_created_date)) }}</div>
 
                         <div class="bg-light p-2 mb-3" style="border-left: 3px solid #0fb3c2; border-radius: 2px;">
                            <div class="res-info-label text-dark">Saran & Masukan</div>
