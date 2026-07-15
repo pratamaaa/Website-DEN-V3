@@ -96,32 +96,40 @@
                 serverSide: true,
                 ajax: "{{ route('publikasi.list') }}",
 
-                columns: [{
-                        data: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'judulpublikasi'
-                    },
-                    {
-                        data: 'kategori'
-                    },
-                    {
-                        data: 'tanggalposting'
-                    },
-                    {
-                        data: 'filedownload'
-                    },
-                    {
-                        data: 'counter'
-                    },
-                    {
-                        data: 'action',
-                        orderable: false,
-                        searchable: false
-                    }
-                ],
+                columns: [
+    {
+        data: 'DT_RowIndex',
+        name: 'DT_RowIndex',
+        orderable: false,
+        searchable: false
+    },
+    {
+        data: 'judulpublikasi',
+        name: 'publikasi.judul_publikasi'
+    },
+    {
+        data: 'kategori',
+        name: 'publikasi_kategori.nama_kategori'
+    },
+    {
+        data: 'tanggalposting',
+        name: 'publikasi.tanggal_publikasi'
+    },
+    {
+        data: 'filedownload',
+        orderable: false,
+        searchable: false
+    },
+    {
+        data: 'counter',
+        name: 'publikasi.hits'
+    },
+    {
+        data: 'action',
+        orderable: false,
+        searchable: false
+    }
+],
 
                 columnDefs: [{
                     className: "ratatengah",

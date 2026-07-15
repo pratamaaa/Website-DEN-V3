@@ -174,6 +174,7 @@ Route::middleware(['auth', MfaMiddleware::class])->group(function () {
             Route::get('/hasil-analisa-list', 'hasil_analisa_list')->name('kuesioner.analisa.list');
             Route::get('/hasil-analisa-list-ikl', 'hasil_analisa_list_ikl')->name('kuesioner.analisa.ikl');
             Route::get('/hasil-analisa-list-matriks', 'hasil_analisa_list_matriks')->name('kuesioner.analisa.matriks');
+            Route::post('/hasil-analisa-export', 'hasil_analisa_export')->name('kuesioner.analisa.export');
         });
 });
 

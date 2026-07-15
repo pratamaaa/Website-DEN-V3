@@ -1,8 +1,8 @@
 @extends('layout.dapur.app')
 
 @section('content')
-   {{-- Library Chart.js --}}
-   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   {{-- Library Chart.js & SheetJS --}}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
    <style>
       /* =========================================
@@ -100,9 +100,12 @@
          <div class="row">
             <div class="col-sm-12">
                <div class="card">
-                  <div class="card-header">
-                     <h5>{{ $judulhalaman }}</h5>
-                  </div>
+                  <div class="card-header d-flex align-items-center justify-content-between">
+   <h5 class="m-0">{{ $judulhalaman }}</h5>
+   <button id="btnExportAll" class="btn btn-success btn-sm">
+   <i class="feather icon-download mr-1"></i> Export Semua (Excel)
+</button>
+</div>
                   <div class="card-body">
 
                      {{-- TABS NAVIGATION --}}
@@ -301,6 +304,8 @@
             ajax: {
                url: "{{ url('/kuesioner/hasil-analisa-list') }}",
                dataSrc: function(json) {
+                   window._dataTab1 = json; // cache untuk export
+
                   // --- FILL WIDGET RESPONDEN (MODERN) ---
                   if (json.responden_per_layanan) {
                      var rows = '';
@@ -352,6 +357,7 @@
             $.ajax({
                url: "{{ url('/kuesioner/hasil-analisa-list-ikl') }}", method: "GET",
                success: function(response) {
+                  window._dataTab2 = response; // cache untuk export
                   var dataRows = response.data; var totalResponden = parseInt(response.total_responden); var totalImp = parseFloat(response.total_importance || 0);
                   var tableBody = ""; var sumWeight = 0; var sumWeightIndex = 0;
                   $.each(dataRows, function(index, item) {
@@ -378,6 +384,7 @@
             $.ajax({
                url: "{{ url('/kuesioner/hasil-analisa-list-matriks') }}", method: "GET",
                success: function(response) {
+                  window._dataTab3 = response; // cache untuk export
                   var data = response.data; var axisX = parseFloat(response.axis_x); var axisY = parseFloat(response.axis_y);
                   $('#val-axis-y').text(axisY.toFixed(2)); $('#val-axis-x').text(axisX.toFixed(2));
                   var tableBody = ""; var chartPoints = [];
@@ -409,12 +416,66 @@
             });
          }
 
+         // Preload data Tab 2 & 3 di background biar Export bisa langsung dipakai
+         loadRekapIKL();
+         loadRekapMatriks();
+
          // --- TRIGGER PINDAH TAB ---
          $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
             if (e.target.hash === '#tab-grafik') loadRekapIKL();
             else if (e.target.hash === '#tab-data') setTimeout(function() { table.columns.adjust().draw(); }, 200);
             else if (e.target.hash === '#tab-info') loadRekapMatriks();
          });
+
+   
       });
+
+      $('#btnExportAll').on('click', function() {
+   var $btn = $(this);
+   var originalHtml = $btn.html();
+   $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-1"></i> Menyiapkan...');
+
+   // Pastikan chart matriks sudah ke-render dulu
+   function doExport() {
+      var chartImage = chartMatriks ? chartMatriks.toBase64Image('image/png', 1) : null;
+
+      fetch("{{ url('/kuesioner/hasil-analisa-export') }}", {
+         method: 'POST',
+         headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+         },
+         body: JSON.stringify({ chart_image: chartImage })
+      })
+      .then(function(response) {
+         if (!response.ok) throw new Error('Export gagal');
+         return response.blob();
+      })
+      .then(function(blob) {
+         var url = window.URL.createObjectURL(blob);
+         var a = document.createElement('a');
+         a.href = url;
+         a.download = 'hasil-analisa-' + new Date().toISOString().slice(0, 10) + '.xlsx';
+         document.body.appendChild(a);
+         a.click();
+         a.remove();
+         window.URL.revokeObjectURL(url);
+      })
+      .catch(function(err) {
+         alert('Gagal export: ' + err.message);
+      })
+      .finally(function() {
+         $btn.prop('disabled', false).html(originalHtml);
+      });
+   }
+
+   // Kalau chart matriks belum sempat di-render (misal user belum pernah buka tab itu), load dulu
+   if (!chartMatriks) {
+      loadRekapMatriks();
+      setTimeout(doExport, 800); // beri jeda render chart
+   } else {
+      doExport();
+   }
+});
    </script>
 @endsection

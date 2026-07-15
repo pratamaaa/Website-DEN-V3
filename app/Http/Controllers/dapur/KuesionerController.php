@@ -530,6 +530,379 @@ $data['total_pemda_responden'] = $pemdaStats->sum('total');
         ]);
     }
 
+    public function hasil_analisa_export(Request $request)
+{
+    ini_set('memory_limit', '512M');
+
+    // ============================================================
+    // 1. AMBIL DATA (logic sama persis dengan 3 endpoint JSON)
+    // ============================================================
+    $parameterList = \App\Models\KuesionerParameter::orderBy('kuesioner_parameter_code', 'asc')->get();
+    $layananList = \App\Models\KuesionerLayanan::all();
+
+    // --- Rekap Input ---
+    $rekapInput = [];
+    foreach ($parameterList as $param) {
+        $kodeParam = $param->kuesioner_parameter_code;
+        $namaParam = $param->kuesioner_parameter_nama;
+        $uuidParam = $param->kuesioner_parameter_uuid;
+
+        $rowImp = ['kode' => $kodeParam, 'parameter' => $namaParam, 'tipe' => 'Importance'];
+        $rowPerf = ['kode' => $kodeParam, 'parameter' => $namaParam, 'tipe' => 'Performance'];
+        $rowGap = ['kode' => $kodeParam, 'parameter' => $namaParam, 'tipe' => 'Gap'];
+
+        $sumImp = 0; $sumPerf = 0; $countLayanan = 0;
+
+        foreach ($layananList as $l) {
+            $key = 'layanan_' . $l->kuesioner_layanan_uuid;
+            $uuidLayanan = $l->kuesioner_layanan_uuid;
+
+            $avgImp = DB::table('kuesioner_jawaban_responden as jr')
+                ->join('kuesioner_pertanyaan as p_child', 'jr.kuesioner_pertanyaan_uuid', '=', 'p_child.kuesioner_pertanyaan_uuid')
+                ->join('kuesioner_pertanyaan as p_parent', 'p_child.kuesioner_pertanyaan_parent_uuid', '=', 'p_parent.kuesioner_pertanyaan_uuid')
+                ->join('kuesioner_jawaban as j', 'jr.kuesioner_jawaban_uuid', '=', 'j.kuesioner_jawaban_uuid')
+                ->join('kuesioner_responden as r', 'jr.kuesioner_responden_uuid', '=', 'r.kuesioner_responden_uuid')
+                ->where('p_parent.kuesioner_pertanyaan_parameter_uuid', $uuidParam)
+                ->where('p_child.kuesioner_pertanyaan_aspect', 1)
+                ->where('r.kuesioner_layanan_uuid', $uuidLayanan)
+                ->avg('j.kuesioner_jawaban_bobot');
+
+            $avgPerf = DB::table('kuesioner_jawaban_responden as jr')
+                ->join('kuesioner_pertanyaan as p_child', 'jr.kuesioner_pertanyaan_uuid', '=', 'p_child.kuesioner_pertanyaan_uuid')
+                ->join('kuesioner_pertanyaan as p_parent', 'p_child.kuesioner_pertanyaan_parent_uuid', '=', 'p_parent.kuesioner_pertanyaan_uuid')
+                ->join('kuesioner_jawaban as j', 'jr.kuesioner_jawaban_uuid', '=', 'j.kuesioner_jawaban_uuid')
+                ->join('kuesioner_responden as r', 'jr.kuesioner_responden_uuid', '=', 'r.kuesioner_responden_uuid')
+                ->where('p_parent.kuesioner_pertanyaan_parameter_uuid', $uuidParam)
+                ->where('p_child.kuesioner_pertanyaan_aspect', 2)
+                ->where('r.kuesioner_layanan_uuid', $uuidLayanan)
+                ->avg('j.kuesioner_jawaban_bobot');
+
+            $avgImp = $avgImp ? floatval($avgImp) : 0;
+            $avgPerf = $avgPerf ? floatval($avgPerf) : 0;
+
+            $rowImp[$key] = round($avgImp, 2);
+            $rowPerf[$key] = round($avgPerf, 2);
+            $rowGap[$key] = round($avgPerf - $avgImp, 2);
+
+            $sumImp += $avgImp; $sumPerf += $avgPerf; $countLayanan++;
+        }
+
+        $totalAvgImp = $countLayanan > 0 ? ($sumImp / $countLayanan) : 0;
+        $totalAvgPerf = $countLayanan > 0 ? ($sumPerf / $countLayanan) : 0;
+
+        $rowImp['rata_rata'] = round($totalAvgImp, 2);
+        $rowPerf['rata_rata'] = round($totalAvgPerf, 2);
+        $rowGap['rata_rata'] = round($totalAvgPerf - $totalAvgImp, 2);
+
+        $rekapInput[] = $rowImp;
+        $rekapInput[] = $rowPerf;
+        $rekapInput[] = $rowGap;
+    }
+
+    // --- Rekap IKL ---
+    $jumlahResponden = DB::table('kuesioner_responden')->count();
+    $tempData = [];
+    $totalImportance = 0;
+
+    foreach ($parameterList as $param) {
+        $uuidParam = $param->kuesioner_parameter_uuid;
+
+        $avgImp = DB::table('kuesioner_jawaban_responden as jr')
+            ->join('kuesioner_pertanyaan as p_child', 'jr.kuesioner_pertanyaan_uuid', '=', 'p_child.kuesioner_pertanyaan_uuid')
+            ->join('kuesioner_pertanyaan as p_parent', 'p_child.kuesioner_pertanyaan_parent_uuid', '=', 'p_parent.kuesioner_pertanyaan_uuid')
+            ->join('kuesioner_jawaban as j', 'jr.kuesioner_jawaban_uuid', '=', 'j.kuesioner_jawaban_uuid')
+            ->where('p_parent.kuesioner_pertanyaan_parameter_uuid', $uuidParam)
+            ->where('p_child.kuesioner_pertanyaan_aspect', 1)
+            ->avg('j.kuesioner_jawaban_bobot');
+
+        $avgPerf = DB::table('kuesioner_jawaban_responden as jr')
+            ->join('kuesioner_pertanyaan as p_child', 'jr.kuesioner_pertanyaan_uuid', '=', 'p_child.kuesioner_pertanyaan_uuid')
+            ->join('kuesioner_pertanyaan as p_parent', 'p_child.kuesioner_pertanyaan_parent_uuid', '=', 'p_parent.kuesioner_pertanyaan_uuid')
+            ->join('kuesioner_jawaban as j', 'jr.kuesioner_jawaban_uuid', '=', 'j.kuesioner_jawaban_uuid')
+            ->where('p_parent.kuesioner_pertanyaan_parameter_uuid', $uuidParam)
+            ->where('p_child.kuesioner_pertanyaan_aspect', 2)
+            ->avg('j.kuesioner_jawaban_bobot');
+
+        $valImp = $avgImp ? floatval($avgImp) : 0;
+        $valPerf = $avgPerf ? floatval($avgPerf) : 0;
+
+        $tempData[] = [
+            'kode' => $param->kuesioner_parameter_code,
+            'parameter' => $param->kuesioner_parameter_nama,
+            'importance' => $valImp,
+            'performance' => $valPerf,
+        ];
+        $totalImportance += $valImp;
+    }
+
+    $rekapIkl = [];
+    $sumWeight = 0; $sumWeightIndex = 0;
+    foreach ($tempData as $item) {
+        $weight = $totalImportance > 0 ? ($item['importance'] / $totalImportance) : 0;
+        $weightIndex = $weight * $item['performance'];
+        $sumWeight += $weight;
+        $sumWeightIndex += $weightIndex;
+        $rekapIkl[] = [
+            'kode' => $item['kode'],
+            'parameter' => $item['parameter'],
+            'importance' => $item['importance'],
+            'weight' => $weight,
+            'performance' => $item['performance'],
+            'weight_index' => $weightIndex,
+        ];
+    }
+    $iklScore = $sumWeightIndex;
+
+    // --- Rekap Matriks ---
+    $rekapMatriks = [];
+    $totalImp = 0; $totalPerf = 0; $count = 0;
+    foreach ($parameterList as $param) {
+        $uuidParam = $param->kuesioner_parameter_uuid;
+        $avgImp = DB::table('kuesioner_jawaban_responden as jr')
+            ->join('kuesioner_pertanyaan as p_child', 'jr.kuesioner_pertanyaan_uuid', '=', 'p_child.kuesioner_pertanyaan_uuid')
+            ->join('kuesioner_pertanyaan as p_parent', 'p_child.kuesioner_pertanyaan_parent_uuid', '=', 'p_parent.kuesioner_pertanyaan_uuid')
+            ->join('kuesioner_jawaban as j', 'jr.kuesioner_jawaban_uuid', '=', 'j.kuesioner_jawaban_uuid')
+            ->where('p_parent.kuesioner_pertanyaan_parameter_uuid', $uuidParam)
+            ->where('p_child.kuesioner_pertanyaan_aspect', 1)
+            ->avg('j.kuesioner_jawaban_bobot');
+        $avgPerf = DB::table('kuesioner_jawaban_responden as jr')
+            ->join('kuesioner_pertanyaan as p_child', 'jr.kuesioner_pertanyaan_uuid', '=', 'p_child.kuesioner_pertanyaan_uuid')
+            ->join('kuesioner_pertanyaan as p_parent', 'p_child.kuesioner_pertanyaan_parent_uuid', '=', 'p_parent.kuesioner_pertanyaan_uuid')
+            ->join('kuesioner_jawaban as j', 'jr.kuesioner_jawaban_uuid', '=', 'j.kuesioner_jawaban_uuid')
+            ->where('p_parent.kuesioner_pertanyaan_parameter_uuid', $uuidParam)
+            ->where('p_child.kuesioner_pertanyaan_aspect', 2)
+            ->avg('j.kuesioner_jawaban_bobot');
+
+        $valImp = $avgImp ? floatval($avgImp) : 0;
+        $valPerf = $avgPerf ? floatval($avgPerf) : 0;
+
+        $rekapMatriks[] = [
+            'kode' => $param->kuesioner_parameter_code,
+            'parameter' => $param->kuesioner_parameter_nama,
+            'importance' => $valImp,
+            'performance' => $valPerf,
+            'gap_score' => $valPerf - $valImp,
+        ];
+
+        if ($valImp > 0 || $valPerf > 0) {
+            $totalImp += $valImp; $totalPerf += $valPerf; $count++;
+        }
+    }
+    $axisY = $count > 0 ? ($totalImp / $count) : 0;
+    $axisX = $count > 0 ? ($totalPerf / $count) : 0;
+
+    // ============================================================
+    // 2. BUILD EXCEL DENGAN PhpSpreadsheet
+    // ============================================================
+    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+
+    $headerStyle = [
+        'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+        'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => '0FB3C2']],
+        'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER],
+    ];
+    $thinBorder = ['borders' => ['allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]]];
+
+    // ---------- SHEET 1: REKAP INPUT ----------
+    $sheet1 = $spreadsheet->getActiveSheet();
+    $sheet1->setTitle('Rekap Input');
+
+    $sheet1->setCellValue('A1', 'No');
+    $sheet1->setCellValue('B1', 'Kode');
+    $sheet1->setCellValue('C1', 'Parameter');
+    $sheet1->setCellValue('D1', 'Aspek');
+    $col = 5;
+    foreach ($layananList as $l) {
+    $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col);
+    $sheet1->setCellValue($colLetter . '1', $l->kuesioner_layanan_nama);
+    $col++;
+}
+$colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col);
+$sheet1->setCellValue($colLetter . '1', 'Rata-Rata');
+    $lastCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col);
+    $sheet1->getStyle('A1:' . $lastCol . '1')->applyFromArray($headerStyle);
+
+    $row = 2;
+    $no = 1;
+    foreach ($rekapInput as $data) {
+        if ($data['tipe'] === 'Importance') {
+            $sheet1->setCellValue('A' . $row, $no);
+            $sheet1->setCellValue('B' . $row, $data['kode']);
+            $sheet1->setCellValue('C' . $row, $data['parameter']);
+            $sheet1->mergeCells('A' . $row . ':A' . ($row + 2));
+            $sheet1->mergeCells('B' . $row . ':B' . ($row + 2));
+            $sheet1->mergeCells('C' . $row . ':C' . ($row + 2));
+            $sheet1->getStyle('A' . $row . ':C' . ($row + 2))->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+            $no++;
+        }
+        $sheet1->setCellValue('D' . $row, $data['tipe']);
+        $c = 5;
+foreach ($layananList as $l) {
+    $key = 'layanan_' . $l->kuesioner_layanan_uuid;
+    $cLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($c);
+    $sheet1->setCellValue($cLetter . $row, $data[$key] ?? 0);
+    $c++;
+}
+$cLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($c);
+$sheet1->setCellValue($cLetter . $row, $data['rata_rata']);
+
+        if ($data['tipe'] === 'Gap') {
+            $sheet1->getStyle('D' . $row . ':' . $lastCol . $row)->getFont()->setBold(true);
+            if ($data['rata_rata'] < 0) {
+                $sheet1->getStyle('D' . $row . ':' . $lastCol . $row)->getFont()->getColor()->setRGB('DC3545');
+            }
+        }
+        $row++;
+    }
+    $sheet1->getStyle('A1:' . $lastCol . ($row - 1))->applyFromArray($thinBorder);
+    foreach (range('A', $lastCol) as $colLetter) {
+        $sheet1->getColumnDimension($colLetter)->setAutoSize(true);
+    }
+
+    // ---------- SHEET 2: REKAP IKL ----------
+    $sheet2 = $spreadsheet->createSheet();
+    $sheet2->setTitle('Rekap IKL');
+
+    $sheet2->setCellValue('A1', 'Indeks Kepuasan Layanan (IKL)');
+    $sheet2->mergeCells('A1:B1');
+    $sheet2->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+
+    $sheet2->setCellValue('A2', number_format($iklScore, 2, ',', '.'));
+    $sheet2->mergeCells('A2:B2');
+    $sheet2->getStyle('A2')->getFont()->setBold(true)->setSize(28)->getColor()->setRGB('0FB3C2');
+    $sheet2->getStyle('A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+    $sheet2->getRowDimension(2)->setRowHeight(40);
+
+    $sheet2->setCellValue('A3', 'Jumlah Responden (n)');
+    $sheet2->setCellValue('B3', $jumlahResponden);
+
+    $kategori = [
+        ['range' => '1,00 - 2,59', 'label' => 'Tidak Baik', 'min' => 1, 'max' => 2.59, 'color' => 'FF5252'],
+        ['range' => '2,60 - 3,06', 'label' => 'Kurang Baik', 'min' => 2.60, 'max' => 3.06, 'color' => 'FFBA00'],
+        ['range' => '3,07 - 3,53', 'label' => 'Baik', 'min' => 3.07, 'max' => 3.53, 'color' => '0FB3C2'],
+        ['range' => '3,54 - 4,00', 'label' => 'Sangat Baik', 'min' => 3.54, 'max' => 4.00, 'color' => '4099FF'],
+    ];
+    $r = 5;
+    $sheet2->setCellValue('A' . $r, 'Kategori Nilai Mutu Pelayanan');
+    $sheet2->getStyle('A' . $r)->getFont()->setBold(true);
+    $r++;
+    foreach ($kategori as $k) {
+        $isActive = $iklScore >= $k['min'] && $iklScore <= $k['max'];
+        $sheet2->setCellValue('A' . $r, $k['range']);
+        $sheet2->setCellValue('B' . $r, $k['label']);
+        if ($isActive) {
+            $sheet2->getStyle('A' . $r . ':B' . $r)->getFont()->setBold(true)->getColor()->setRGB('FFFFFF');
+            $sheet2->getStyle('A' . $r . ':B' . $r)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB($k['color']);
+        }
+        $r++;
+    }
+
+    $r += 1;
+    $tableStartRow = $r;
+    $sheet2->setCellValue('A' . $r, 'No');
+    $sheet2->setCellValue('B' . $r, 'Kode');
+    $sheet2->setCellValue('C' . $r, 'Parameter');
+    $sheet2->setCellValue('D' . $r, 'Importance');
+    $sheet2->setCellValue('E' . $r, 'Weight');
+    $sheet2->setCellValue('F' . $r, 'Performance');
+    $sheet2->setCellValue('G' . $r, 'Weight Index');
+    $sheet2->getStyle('A' . $r . ':G' . $r)->applyFromArray($headerStyle);
+    $r++;
+
+    foreach ($rekapIkl as $i => $item) {
+        $sheet2->setCellValue('A' . $r, $i + 1);
+        $sheet2->setCellValue('B' . $r, $item['kode']);
+        $sheet2->setCellValue('C' . $r, $item['parameter']);
+        $sheet2->setCellValue('D' . $r, round($item['importance'], 2));
+        $sheet2->setCellValue('E' . $r, round($item['weight'], 3));
+        $sheet2->setCellValue('F' . $r, round($item['performance'], 2));
+        $sheet2->setCellValue('G' . $r, round($item['weight_index'], 3));
+        $r++;
+    }
+    $sheet2->setCellValue('C' . $r, 'TOTAL');
+    $sheet2->setCellValue('E' . $r, round($sumWeight, 3));
+    $sheet2->setCellValue('G' . $r, round($sumWeightIndex, 3));
+    $sheet2->getStyle('A' . $r . ':G' . $r)->getFont()->setBold(true);
+
+    $sheet2->getStyle('A' . $tableStartRow . ':G' . $r)->applyFromArray($thinBorder);
+    foreach (range('A', 'G') as $colLetter) {
+        $sheet2->getColumnDimension($colLetter)->setAutoSize(true);
+    }
+
+    // ---------- SHEET 3: REKAP MATRIKS ----------
+    $sheet3 = $spreadsheet->createSheet();
+    $sheet3->setTitle('Rekap Matriks');
+
+    $sheet3->setCellValue('A1', 'Posisi Vertical Axis Y (Importance)');
+    $sheet3->setCellValue('B1', round($axisY, 2));
+    $sheet3->setCellValue('A2', 'Posisi Horizontal Axis X (Performance)');
+    $sheet3->setCellValue('B2', round($axisX, 2));
+    $sheet3->getStyle('A1:A2')->getFont()->setBold(true);
+
+    $r = 4;
+    $sheet3->setCellValue('A' . $r, 'No');
+    $sheet3->setCellValue('B' . $r, 'Kode');
+    $sheet3->setCellValue('C' . $r, 'Parameter');
+    $sheet3->setCellValue('D' . $r, 'Performance');
+    $sheet3->setCellValue('E' . $r, 'Importance');
+    $sheet3->setCellValue('F' . $r, 'Gap');
+    $sheet3->getStyle('A' . $r . ':F' . $r)->applyFromArray($headerStyle);
+    $dataStartRow = $r + 1;
+    $r++;
+
+    foreach ($rekapMatriks as $i => $item) {
+        $sheet3->setCellValue('A' . $r, $i + 1);
+        $sheet3->setCellValue('B' . $r, $item['kode']);
+        $sheet3->setCellValue('C' . $r, $item['parameter']);
+        $sheet3->setCellValue('D' . $r, round($item['performance'], 2));
+        $sheet3->setCellValue('E' . $r, round($item['importance'], 2));
+        $sheet3->setCellValue('F' . $r, round($item['gap_score'], 2));
+        $sheet3->getStyle('F' . $r)->getFont()->getColor()->setRGB($item['gap_score'] < 0 ? 'DC3545' : '198754');
+        $r++;
+    }
+    $dataEndRow = $r - 1;
+
+    $sheet3->getStyle('A4:F' . $dataEndRow)->applyFromArray($thinBorder);
+    foreach (range('A', 'F') as $colLetter) {
+        $sheet3->getColumnDimension($colLetter)->setAutoSize(true);
+    }
+
+    // --- Tempel gambar Chart.js hasil screenshot dari halaman ---
+$chartImage = $request->input('chart_image');
+if ($chartImage && preg_match('/^data:image\/(\w+);base64,/', $chartImage, $matches)) {
+    $base64Data = substr($chartImage, strpos($chartImage, ',') + 1);
+    $binaryData = base64_decode($base64Data);
+    $gdImage = imagecreatefromstring($binaryData);
+
+    if ($gdImage) {
+        $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing();
+        $drawing->setName('Kuadran Chart');
+        $drawing->setDescription('Importance vs Performance');
+        $drawing->setImageResource($gdImage);
+        $drawing->setRenderingFunction(\PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing::RENDERING_PNG);
+        $drawing->setMimeType(\PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing::MIMETYPE_PNG);
+        $drawing->setCoordinates('H4');
+        $drawing->setWidth(650);
+        $drawing->setHeight(430);
+        $drawing->setWorksheet($sheet3);
+    }
+}
+
+    // ============================================================
+    // 3. OUTPUT
+    // ============================================================
+    $spreadsheet->setActiveSheetIndex(0);
+    $fileName = 'hasil-analisa-' . date('Y-m-d') . '.xlsx';
+    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+    $writer->setIncludeCharts(true);
+
+    return response()->streamDownload(function () use ($writer) {
+        $writer->save('php://output');
+    }, $fileName, [
+        'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ]);
+}
+
     public function hasil_analisa_list_matriks(Request $request)
     {
         $parameterList = \App\Models\KuesionerParameter::orderBy('kuesioner_parameter_code', 'asc')->get();
