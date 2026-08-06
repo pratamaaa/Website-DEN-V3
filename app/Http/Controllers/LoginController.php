@@ -157,8 +157,11 @@ if (!$user->nip) {
         // =========================
         // SEMUA ROLE WAJIB MFA
         // =========================
+        if (! $user->mfa_secret || ! $user->mfa_enabled) {
+            return redirect()->route('mfa.setup');
+        }
+
         return redirect()->route('mfa.verify');
-    }
 
     public function logout(Request $request)
     {

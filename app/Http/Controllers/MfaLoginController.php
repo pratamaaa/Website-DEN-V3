@@ -15,6 +15,12 @@ class MfaLoginController extends Controller
             return redirect()->route('login');
         }
 
+        $user = Auth::user();
+
+        if (! $user->mfa_secret || ! $user->mfa_enabled) {
+            return redirect()->route('mfa.setup');
+        }
+
         if (session()->has('force_password_reset_user')) {
             return redirect('/force-change-password');
         }
@@ -46,7 +52,7 @@ class MfaLoginController extends Controller
             ]);
         }
 
-        if (! $user->mfa_secret) {
+        if (! $user->mfa_secret || ! $user->mfa_enabled) {
             return redirect()->route('mfa.setup');
         }
 
