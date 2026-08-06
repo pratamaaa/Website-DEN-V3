@@ -33,31 +33,41 @@ class MfaController extends Controller
     }
 
     public function enable(Request $request)
-    {
-        $request->validate([
-            'otp' => 'required|digits:6',
-        ]);
+{
+    $request->validate([
+        'otp' => 'required|digits:6',
+    ]);
 
-        $user = Auth::user();
+    $user = Auth::user();
 
-        if (! $user || ! $user->mfa_secret) {
-            return redirect()->route('mfa.setup');
-        }
-
-        $google2fa = new Google2FA;
-
-        $valid = $google2fa->verifyKey(
-            $user->mfa_secret,
-            $request->otp,
-            1
-        );
-
-        if (! $valid) {
-            return back()->withErrors([
-                'otp' => 'Kode OTP tidak valid',
-            ]);
-        }
-
-        return redirect()->route('mfa.verify');
+    if (! $user || ! $user->mfa_secret) {
+        return redirect()->route('mfa.setup');
     }
+
+    $google2fa = new Google2FA;
+
+    // DEBUG SEMENTARA
+    dd([
+        'otp_input'      => $request->otp,
+        'otp_length'     => strlen($request->otp),
+        'mfa_secret'     => $user->mfa_secret,
+        'secret_length'  => strlen($user->mfa_secret),
+        'current_server_otp' => $google2fa->getCurrentOtp($user->mfa_secret),
+        'verify_result'  => $google2fa->verifyKey($user->mfa_secret, $request->otp, 1),
+    ]);
+
+    $valid = $google2fa->verifyKey(
+        $user->mfa_secret,
+        $request->otp,
+        1
+    );
+
+    if (! $valid) {
+        return back()->withErrors([
+            'otp' => 'Kode OTP tidak valid',
+        ]);
+    }
+
+    return redirect()->route('mfa.verify');
+}
 }
