@@ -162,6 +162,7 @@ if (!$user->nip) {
         }
 
         return redirect()->route('mfa.verify');
+    }  
 
     public function logout(Request $request)
     {
