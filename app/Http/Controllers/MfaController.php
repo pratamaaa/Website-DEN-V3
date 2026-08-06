@@ -46,16 +46,6 @@ class MfaController extends Controller
 
     $google2fa = new Google2FA;
 
-    // DEBUG SEMENTARA
-    dd([
-        'otp_input'      => $request->otp,
-        'otp_length'     => strlen($request->otp),
-        'mfa_secret'     => $user->mfa_secret,
-        'secret_length'  => strlen($user->mfa_secret),
-        'current_server_otp' => $google2fa->getCurrentOtp($user->mfa_secret),
-        'verify_result'  => $google2fa->verifyKey($user->mfa_secret, $request->otp, 1),
-    ]);
-
     $valid = $google2fa->verifyKey(
         $user->mfa_secret,
         $request->otp,
@@ -67,6 +57,9 @@ class MfaController extends Controller
             'otp' => 'Kode OTP tidak valid',
         ]);
     }
+
+    $user->mfa_enabled = true;
+    $user->save();
 
     return redirect()->route('mfa.verify');
 }
