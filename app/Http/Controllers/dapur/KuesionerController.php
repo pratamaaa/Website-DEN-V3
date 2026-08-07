@@ -881,7 +881,7 @@ $sheet1->setCellValue($cLetter . $row, $data['rata_rata']);
     $chart->setTopLeftPosition('H4');
     $chart->setBottomRightPosition('P25');
     $sheet3->addChart($chart);
-catch (\Throwable $e) {
+} catch (\Throwable $e) {
     \Log::info('Export - Data processing selesai: ' . round(microtime(true) - $t0, 2) . 's');
     // ============================================================
     // 3. OUTPUT
