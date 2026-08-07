@@ -852,27 +852,36 @@ $sheet1->setCellValue($cLetter . $row, $data['rata_rata']);
         $sheet3->getColumnDimension($colLetter)->setAutoSize(true);
     }
 
-    // --- Tempel gambar Chart.js hasil screenshot dari halaman ---
-$chartImage = $request->input('chart_image');
-if ($chartImage && preg_match('/^data:image\/(\w+);base64,/', $chartImage, $matches)) {
-    $base64Data = substr($chartImage, strpos($chartImage, ',') + 1);
-    $binaryData = base64_decode($base64Data);
-    $gdImage = imagecreatefromstring($binaryData);
+    // --- Native Scatter Chart (kuadran masih berantakan/ada garis, tapi cepat) ---
+    $xValues = new \PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues(
+        \PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues::DATASERIES_TYPE_NUMBER,
+        "'Rekap Matriks'!\$D\${$dataStartRow}:\$D\${$dataEndRow}", null, $dataEndRow - $dataStartRow + 1
+    );
+    $yValues = new \PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues(
+        \PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues::DATASERIES_TYPE_NUMBER,
+        "'Rekap Matriks'!\$E\${$dataStartRow}:\$E\${$dataEndRow}", null, $dataEndRow - $dataStartRow + 1
+    );
+    $seriesLabel = new \PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues(
+        \PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues::DATASERIES_TYPE_STRING,
+        "'Rekap Matriks'!\$C\$4", null, 1
+    );
 
-    if ($gdImage) {
-        $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing();
-        $drawing->setName('Kuadran Chart');
-        $drawing->setDescription('Importance vs Performance');
-        $drawing->setImageResource($gdImage);
-        $drawing->setRenderingFunction(\PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing::RENDERING_PNG);
-        $drawing->setMimeType(\PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing::MIMETYPE_PNG);
-        $drawing->setCoordinates('H4');
-        $drawing->setWidth(650);
-        $drawing->setHeight(430);
-        $drawing->setWorksheet($sheet3);
-    }
-}
-\Log::info('Export - Data processing selesai: ' . round(microtime(true) - $t0, 2) . 's');
+    $series = new \PhpOffice\PhpSpreadsheet\Chart\DataSeries(
+        \PhpOffice\PhpSpreadsheet\Chart\DataSeries::TYPE_SCATTERCHART,
+        null, [0], [$seriesLabel], [$xValues], [$yValues]
+    );
+    $series->setPlotStyle('marker');
+
+    $plotArea = new \PhpOffice\PhpSpreadsheet\Chart\PlotArea(null, [$series]);
+    $legend = new \PhpOffice\PhpSpreadsheet\Chart\Legend(\PhpOffice\PhpSpreadsheet\Chart\Legend::POSITION_RIGHT, null, false);
+    $title = new \PhpOffice\PhpSpreadsheet\Chart\Title('Importance vs Performance');
+
+    $chart = new \PhpOffice\PhpSpreadsheet\Chart\Chart('kuadranChart', $title, $legend, $plotArea);
+    $chart->setTopLeftPosition('H4');
+    $chart->setBottomRightPosition('P25');
+    $sheet3->addChart($chart);
+
+    \Log::info('Export - Data processing selesai: ' . round(microtime(true) - $t0, 2) . 's');
     // ============================================================
     // 3. OUTPUT
     // ============================================================

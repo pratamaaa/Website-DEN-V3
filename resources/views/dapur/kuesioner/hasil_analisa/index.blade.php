@@ -100,9 +100,9 @@
          <div class="row">
             <div class="col-sm-12">
                <div class="card">
-                  <div class="card-header">
-   <h5 class="m-0">{{ $judulhalaman }}</h5>
-</div>
+                  <a href="{{ url('/kuesioner/hasil-analisa-export') }}" class="btn btn-success btn-sm">
+   <i class="feather icon-download mr-1"></i> Export Semua (Excel)
+</a>
                   <div class="card-body">
 
                      {{-- TABS NAVIGATION --}}
