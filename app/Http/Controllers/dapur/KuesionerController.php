@@ -531,7 +531,8 @@ $data['total_pemda_responden'] = $pemdaStats->sum('total');
     }
 
     public function hasil_analisa_export(Request $request)
-{
+{ 
+    $t0 = microtime(true);
     ini_set('memory_limit', '512M');
 
     // ============================================================
@@ -674,7 +675,7 @@ foreach ($parameterList as $param) {
 }
 $axisY = $count > 0 ? ($totalImp / $count) : 0;
 $axisX = $count > 0 ? ($totalPerf / $count) : 0;
-
+\Log::info('Export - Query selesai: ' . round(microtime(true) - $t0, 2) . 's');
     // ============================================================
     // 2. BUILD EXCEL DENGAN PhpSpreadsheet
     // ============================================================
@@ -871,7 +872,7 @@ if ($chartImage && preg_match('/^data:image\/(\w+);base64,/', $chartImage, $matc
         $drawing->setWorksheet($sheet3);
     }
 }
-
+\Log::info('Export - Data processing selesai: ' . round(microtime(true) - $t0, 2) . 's');
     // ============================================================
     // 3. OUTPUT
     // ============================================================
@@ -881,7 +882,9 @@ if ($chartImage && preg_match('/^data:image\/(\w+);base64,/', $chartImage, $matc
     $writer->setIncludeCharts(true);
 
     return response()->streamDownload(function () use ($writer) {
+        \Log::info('Export - Mulai writer save: ' . round(microtime(true) - $t0, 2) . 's');
         $writer->save('php://output');
+\Log::info('Export - Writer save selesai: ' . round(microtime(true) - $t0, 2) . 's');
     }, $fileName, [
         'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     ]);
