@@ -535,161 +535,145 @@ $data['total_pemda_responden'] = $pemdaStats->sum('total');
     ini_set('memory_limit', '512M');
 
     // ============================================================
-    // 1. AMBIL DATA (logic sama persis dengan 3 endpoint JSON)
-    // ============================================================
-    $parameterList = \App\Models\KuesionerParameter::orderBy('kuesioner_parameter_code', 'asc')->get();
-    $layananList = \App\Models\KuesionerLayanan::all();
+// 1. AMBIL DATA (dioptimasi jadi 2 query saja, bukan nested loop)
+// ============================================================
+$parameterList = \App\Models\KuesionerParameter::orderBy('kuesioner_parameter_code', 'asc')->get();
+$layananList = \App\Models\KuesionerLayanan::all();
 
-    // --- Rekap Input ---
-    $rekapInput = [];
-    foreach ($parameterList as $param) {
-        $kodeParam = $param->kuesioner_parameter_code;
-        $namaParam = $param->kuesioner_parameter_nama;
-        $uuidParam = $param->kuesioner_parameter_uuid;
+// --- Query #1: rata-rata per parameter x aspect x layanan (buat Rekap Input) ---
+$avgPerLayanan = DB::table('kuesioner_jawaban_responden as jr')
+    ->join('kuesioner_pertanyaan as p_child', 'jr.kuesioner_pertanyaan_uuid', '=', 'p_child.kuesioner_pertanyaan_uuid')
+    ->join('kuesioner_pertanyaan as p_parent', 'p_child.kuesioner_pertanyaan_parent_uuid', '=', 'p_parent.kuesioner_pertanyaan_uuid')
+    ->join('kuesioner_jawaban as j', 'jr.kuesioner_jawaban_uuid', '=', 'j.kuesioner_jawaban_uuid')
+    ->join('kuesioner_responden as r', 'jr.kuesioner_responden_uuid', '=', 'r.kuesioner_responden_uuid')
+    ->select(
+        'p_parent.kuesioner_pertanyaan_parameter_uuid as param_uuid',
+        'p_child.kuesioner_pertanyaan_aspect as aspect',
+        'r.kuesioner_layanan_uuid as layanan_uuid',
+        DB::raw('AVG(j.kuesioner_jawaban_bobot) as avg_bobot')
+    )
+    ->groupBy('p_parent.kuesioner_pertanyaan_parameter_uuid', 'p_child.kuesioner_pertanyaan_aspect', 'r.kuesioner_layanan_uuid')
+    ->get();
 
-        $rowImp = ['kode' => $kodeParam, 'parameter' => $namaParam, 'tipe' => 'Importance'];
-        $rowPerf = ['kode' => $kodeParam, 'parameter' => $namaParam, 'tipe' => 'Performance'];
-        $rowGap = ['kode' => $kodeParam, 'parameter' => $namaParam, 'tipe' => 'Gap'];
+$mapPerLayanan = [];
+foreach ($avgPerLayanan as $row) {
+    $mapPerLayanan[$row->param_uuid][$row->aspect][$row->layanan_uuid] = (float) $row->avg_bobot;
+}
 
-        $sumImp = 0; $sumPerf = 0; $countLayanan = 0;
+// --- Query #2: rata-rata global per parameter x aspect (buat IKL & Matriks) ---
+$avgGlobal = DB::table('kuesioner_jawaban_responden as jr')
+    ->join('kuesioner_pertanyaan as p_child', 'jr.kuesioner_pertanyaan_uuid', '=', 'p_child.kuesioner_pertanyaan_uuid')
+    ->join('kuesioner_pertanyaan as p_parent', 'p_child.kuesioner_pertanyaan_parent_uuid', '=', 'p_parent.kuesioner_pertanyaan_uuid')
+    ->join('kuesioner_jawaban as j', 'jr.kuesioner_jawaban_uuid', '=', 'j.kuesioner_jawaban_uuid')
+    ->select(
+        'p_parent.kuesioner_pertanyaan_parameter_uuid as param_uuid',
+        'p_child.kuesioner_pertanyaan_aspect as aspect',
+        DB::raw('AVG(j.kuesioner_jawaban_bobot) as avg_bobot')
+    )
+    ->groupBy('p_parent.kuesioner_pertanyaan_parameter_uuid', 'p_child.kuesioner_pertanyaan_aspect')
+    ->get();
 
-        foreach ($layananList as $l) {
-            $key = 'layanan_' . $l->kuesioner_layanan_uuid;
-            $uuidLayanan = $l->kuesioner_layanan_uuid;
+$mapGlobal = [];
+foreach ($avgGlobal as $row) {
+    $mapGlobal[$row->param_uuid][$row->aspect] = (float) $row->avg_bobot;
+}
 
-            $avgImp = DB::table('kuesioner_jawaban_responden as jr')
-                ->join('kuesioner_pertanyaan as p_child', 'jr.kuesioner_pertanyaan_uuid', '=', 'p_child.kuesioner_pertanyaan_uuid')
-                ->join('kuesioner_pertanyaan as p_parent', 'p_child.kuesioner_pertanyaan_parent_uuid', '=', 'p_parent.kuesioner_pertanyaan_uuid')
-                ->join('kuesioner_jawaban as j', 'jr.kuesioner_jawaban_uuid', '=', 'j.kuesioner_jawaban_uuid')
-                ->join('kuesioner_responden as r', 'jr.kuesioner_responden_uuid', '=', 'r.kuesioner_responden_uuid')
-                ->where('p_parent.kuesioner_pertanyaan_parameter_uuid', $uuidParam)
-                ->where('p_child.kuesioner_pertanyaan_aspect', 1)
-                ->where('r.kuesioner_layanan_uuid', $uuidLayanan)
-                ->avg('j.kuesioner_jawaban_bobot');
+// --- Bangun Rekap Input (dari $mapPerLayanan, tanpa query tambahan) ---
+$rekapInput = [];
+foreach ($parameterList as $param) {
+    $uuidParam = $param->kuesioner_pertanyaan_parameter_uuid ?? $param->kuesioner_parameter_uuid;
+    $kodeParam = $param->kuesioner_parameter_code;
+    $namaParam = $param->kuesioner_parameter_nama;
 
-            $avgPerf = DB::table('kuesioner_jawaban_responden as jr')
-                ->join('kuesioner_pertanyaan as p_child', 'jr.kuesioner_pertanyaan_uuid', '=', 'p_child.kuesioner_pertanyaan_uuid')
-                ->join('kuesioner_pertanyaan as p_parent', 'p_child.kuesioner_pertanyaan_parent_uuid', '=', 'p_parent.kuesioner_pertanyaan_uuid')
-                ->join('kuesioner_jawaban as j', 'jr.kuesioner_jawaban_uuid', '=', 'j.kuesioner_jawaban_uuid')
-                ->join('kuesioner_responden as r', 'jr.kuesioner_responden_uuid', '=', 'r.kuesioner_responden_uuid')
-                ->where('p_parent.kuesioner_pertanyaan_parameter_uuid', $uuidParam)
-                ->where('p_child.kuesioner_pertanyaan_aspect', 2)
-                ->where('r.kuesioner_layanan_uuid', $uuidLayanan)
-                ->avg('j.kuesioner_jawaban_bobot');
+    $rowImp = ['kode' => $kodeParam, 'parameter' => $namaParam, 'tipe' => 'Importance'];
+    $rowPerf = ['kode' => $kodeParam, 'parameter' => $namaParam, 'tipe' => 'Performance'];
+    $rowGap = ['kode' => $kodeParam, 'parameter' => $namaParam, 'tipe' => 'Gap'];
 
-            $avgImp = $avgImp ? floatval($avgImp) : 0;
-            $avgPerf = $avgPerf ? floatval($avgPerf) : 0;
+    $sumImp = 0; $sumPerf = 0; $countLayanan = 0;
 
-            $rowImp[$key] = round($avgImp, 2);
-            $rowPerf[$key] = round($avgPerf, 2);
-            $rowGap[$key] = round($avgPerf - $avgImp, 2);
+    foreach ($layananList as $l) {
+        $key = 'layanan_' . $l->kuesioner_layanan_uuid;
+        $avgImp = $mapPerLayanan[$param->kuesioner_parameter_uuid][1][$l->kuesioner_layanan_uuid] ?? 0;
+        $avgPerf = $mapPerLayanan[$param->kuesioner_parameter_uuid][2][$l->kuesioner_layanan_uuid] ?? 0;
 
-            $sumImp += $avgImp; $sumPerf += $avgPerf; $countLayanan++;
-        }
+        $rowImp[$key] = round($avgImp, 2);
+        $rowPerf[$key] = round($avgPerf, 2);
+        $rowGap[$key] = round($avgPerf - $avgImp, 2);
 
-        $totalAvgImp = $countLayanan > 0 ? ($sumImp / $countLayanan) : 0;
-        $totalAvgPerf = $countLayanan > 0 ? ($sumPerf / $countLayanan) : 0;
-
-        $rowImp['rata_rata'] = round($totalAvgImp, 2);
-        $rowPerf['rata_rata'] = round($totalAvgPerf, 2);
-        $rowGap['rata_rata'] = round($totalAvgPerf - $totalAvgImp, 2);
-
-        $rekapInput[] = $rowImp;
-        $rekapInput[] = $rowPerf;
-        $rekapInput[] = $rowGap;
+        $sumImp += $avgImp; $sumPerf += $avgPerf; $countLayanan++;
     }
 
-    // --- Rekap IKL ---
-    $jumlahResponden = DB::table('kuesioner_responden')->count();
-    $tempData = [];
-    $totalImportance = 0;
+    $totalAvgImp = $countLayanan > 0 ? ($sumImp / $countLayanan) : 0;
+    $totalAvgPerf = $countLayanan > 0 ? ($sumPerf / $countLayanan) : 0;
 
-    foreach ($parameterList as $param) {
-        $uuidParam = $param->kuesioner_parameter_uuid;
+    $rowImp['rata_rata'] = round($totalAvgImp, 2);
+    $rowPerf['rata_rata'] = round($totalAvgPerf, 2);
+    $rowGap['rata_rata'] = round($totalAvgPerf - $totalAvgImp, 2);
 
-        $avgImp = DB::table('kuesioner_jawaban_responden as jr')
-            ->join('kuesioner_pertanyaan as p_child', 'jr.kuesioner_pertanyaan_uuid', '=', 'p_child.kuesioner_pertanyaan_uuid')
-            ->join('kuesioner_pertanyaan as p_parent', 'p_child.kuesioner_pertanyaan_parent_uuid', '=', 'p_parent.kuesioner_pertanyaan_uuid')
-            ->join('kuesioner_jawaban as j', 'jr.kuesioner_jawaban_uuid', '=', 'j.kuesioner_jawaban_uuid')
-            ->where('p_parent.kuesioner_pertanyaan_parameter_uuid', $uuidParam)
-            ->where('p_child.kuesioner_pertanyaan_aspect', 1)
-            ->avg('j.kuesioner_jawaban_bobot');
+    $rekapInput[] = $rowImp;
+    $rekapInput[] = $rowPerf;
+    $rekapInput[] = $rowGap;
+}
 
-        $avgPerf = DB::table('kuesioner_jawaban_responden as jr')
-            ->join('kuesioner_pertanyaan as p_child', 'jr.kuesioner_pertanyaan_uuid', '=', 'p_child.kuesioner_pertanyaan_uuid')
-            ->join('kuesioner_pertanyaan as p_parent', 'p_child.kuesioner_pertanyaan_parent_uuid', '=', 'p_parent.kuesioner_pertanyaan_uuid')
-            ->join('kuesioner_jawaban as j', 'jr.kuesioner_jawaban_uuid', '=', 'j.kuesioner_jawaban_uuid')
-            ->where('p_parent.kuesioner_pertanyaan_parameter_uuid', $uuidParam)
-            ->where('p_child.kuesioner_pertanyaan_aspect', 2)
-            ->avg('j.kuesioner_jawaban_bobot');
+// --- Bangun Rekap IKL (dari $mapGlobal, tanpa query tambahan) ---
+$jumlahResponden = DB::table('kuesioner_responden')->count();
+$tempData = [];
+$totalImportance = 0;
 
-        $valImp = $avgImp ? floatval($avgImp) : 0;
-        $valPerf = $avgPerf ? floatval($avgPerf) : 0;
+foreach ($parameterList as $param) {
+    $uuidParam = $param->kuesioner_parameter_uuid;
+    $valImp = $mapGlobal[$uuidParam][1] ?? 0;
+    $valPerf = $mapGlobal[$uuidParam][2] ?? 0;
 
-        $tempData[] = [
-            'kode' => $param->kuesioner_parameter_code,
-            'parameter' => $param->kuesioner_parameter_nama,
-            'importance' => $valImp,
-            'performance' => $valPerf,
-        ];
-        $totalImportance += $valImp;
+    $tempData[] = [
+        'kode' => $param->kuesioner_parameter_code,
+        'parameter' => $param->kuesioner_parameter_nama,
+        'importance' => $valImp,
+        'performance' => $valPerf,
+    ];
+    $totalImportance += $valImp;
+}
+
+$rekapIkl = [];
+$sumWeight = 0; $sumWeightIndex = 0;
+foreach ($tempData as $item) {
+    $weight = $totalImportance > 0 ? ($item['importance'] / $totalImportance) : 0;
+    $weightIndex = $weight * $item['performance'];
+    $sumWeight += $weight;
+    $sumWeightIndex += $weightIndex;
+    $rekapIkl[] = [
+        'kode' => $item['kode'],
+        'parameter' => $item['parameter'],
+        'importance' => $item['importance'],
+        'weight' => $weight,
+        'performance' => $item['performance'],
+        'weight_index' => $weightIndex,
+    ];
+}
+$iklScore = $sumWeightIndex;
+
+// --- Bangun Rekap Matriks (dari $mapGlobal, tanpa query tambahan) ---
+$rekapMatriks = [];
+$totalImp = 0; $totalPerf = 0; $count = 0;
+foreach ($parameterList as $param) {
+    $uuidParam = $param->kuesioner_parameter_uuid;
+    $valImp = $mapGlobal[$uuidParam][1] ?? 0;
+    $valPerf = $mapGlobal[$uuidParam][2] ?? 0;
+
+    $rekapMatriks[] = [
+        'kode' => $param->kuesioner_parameter_code,
+        'parameter' => $param->kuesioner_parameter_nama,
+        'importance' => $valImp,
+        'performance' => $valPerf,
+        'gap_score' => $valPerf - $valImp,
+    ];
+
+    if ($valImp > 0 || $valPerf > 0) {
+        $totalImp += $valImp; $totalPerf += $valPerf; $count++;
     }
-
-    $rekapIkl = [];
-    $sumWeight = 0; $sumWeightIndex = 0;
-    foreach ($tempData as $item) {
-        $weight = $totalImportance > 0 ? ($item['importance'] / $totalImportance) : 0;
-        $weightIndex = $weight * $item['performance'];
-        $sumWeight += $weight;
-        $sumWeightIndex += $weightIndex;
-        $rekapIkl[] = [
-            'kode' => $item['kode'],
-            'parameter' => $item['parameter'],
-            'importance' => $item['importance'],
-            'weight' => $weight,
-            'performance' => $item['performance'],
-            'weight_index' => $weightIndex,
-        ];
-    }
-    $iklScore = $sumWeightIndex;
-
-    // --- Rekap Matriks ---
-    $rekapMatriks = [];
-    $totalImp = 0; $totalPerf = 0; $count = 0;
-    foreach ($parameterList as $param) {
-        $uuidParam = $param->kuesioner_parameter_uuid;
-        $avgImp = DB::table('kuesioner_jawaban_responden as jr')
-            ->join('kuesioner_pertanyaan as p_child', 'jr.kuesioner_pertanyaan_uuid', '=', 'p_child.kuesioner_pertanyaan_uuid')
-            ->join('kuesioner_pertanyaan as p_parent', 'p_child.kuesioner_pertanyaan_parent_uuid', '=', 'p_parent.kuesioner_pertanyaan_uuid')
-            ->join('kuesioner_jawaban as j', 'jr.kuesioner_jawaban_uuid', '=', 'j.kuesioner_jawaban_uuid')
-            ->where('p_parent.kuesioner_pertanyaan_parameter_uuid', $uuidParam)
-            ->where('p_child.kuesioner_pertanyaan_aspect', 1)
-            ->avg('j.kuesioner_jawaban_bobot');
-        $avgPerf = DB::table('kuesioner_jawaban_responden as jr')
-            ->join('kuesioner_pertanyaan as p_child', 'jr.kuesioner_pertanyaan_uuid', '=', 'p_child.kuesioner_pertanyaan_uuid')
-            ->join('kuesioner_pertanyaan as p_parent', 'p_child.kuesioner_pertanyaan_parent_uuid', '=', 'p_parent.kuesioner_pertanyaan_uuid')
-            ->join('kuesioner_jawaban as j', 'jr.kuesioner_jawaban_uuid', '=', 'j.kuesioner_jawaban_uuid')
-            ->where('p_parent.kuesioner_pertanyaan_parameter_uuid', $uuidParam)
-            ->where('p_child.kuesioner_pertanyaan_aspect', 2)
-            ->avg('j.kuesioner_jawaban_bobot');
-
-        $valImp = $avgImp ? floatval($avgImp) : 0;
-        $valPerf = $avgPerf ? floatval($avgPerf) : 0;
-
-        $rekapMatriks[] = [
-            'kode' => $param->kuesioner_parameter_code,
-            'parameter' => $param->kuesioner_parameter_nama,
-            'importance' => $valImp,
-            'performance' => $valPerf,
-            'gap_score' => $valPerf - $valImp,
-        ];
-
-        if ($valImp > 0 || $valPerf > 0) {
-            $totalImp += $valImp; $totalPerf += $valPerf; $count++;
-        }
-    }
-    $axisY = $count > 0 ? ($totalImp / $count) : 0;
-    $axisX = $count > 0 ? ($totalPerf / $count) : 0;
+}
+$axisY = $count > 0 ? ($totalImp / $count) : 0;
+$axisX = $count > 0 ? ($totalPerf / $count) : 0;
 
     // ============================================================
     // 2. BUILD EXCEL DENGAN PhpSpreadsheet
