@@ -854,35 +854,40 @@ $sheet1->setCellValue($cLetter . $row, $data['rata_rata']);
 
     // --- Native Scatter Chart (kuadran masih berantakan/ada garis, tapi cepat) ---
     try {
-    $xValues = new \PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues(
-        \PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues::DATASERIES_TYPE_NUMBER,
-        "'Rekap Matriks'!\$D\${$dataStartRow}:\$D\${$dataEndRow}", null, $dataEndRow - $dataStartRow + 1
-    );
-    $yValues = new \PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues(
-        \PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues::DATASERIES_TYPE_NUMBER,
-        "'Rekap Matriks'!\$E\${$dataStartRow}:\$E\${$dataEndRow}", null, $dataEndRow - $dataStartRow + 1
-    );
-    $seriesLabel = new \PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues(
-        \PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues::DATASERIES_TYPE_STRING,
-        "'Rekap Matriks'!\$C\$4", null, 1
-    );
+        $xValues = new \PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues(
+            \PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues::DATASERIES_TYPE_NUMBER,
+            "'Rekap Matriks'!\$D\${$dataStartRow}:\$D\${$dataEndRow}", null, $dataEndRow - $dataStartRow + 1
+        );
+        $yValues = new \PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues(
+            \PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues::DATASERIES_TYPE_NUMBER,
+            "'Rekap Matriks'!\$E\${$dataStartRow}:\$E\${$dataEndRow}", null, $dataEndRow - $dataStartRow + 1
+        );
+        $seriesLabel = new \PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues(
+            \PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues::DATASERIES_TYPE_STRING,
+            "'Rekap Matriks'!\$C\$4", null, 1
+        );
 
-    $series = new \PhpOffice\PhpSpreadsheet\Chart\DataSeries(
-        \PhpOffice\PhpSpreadsheet\Chart\DataSeries::TYPE_SCATTERCHART,
-        null, [0], [$seriesLabel], [$xValues], [$yValues]
-    );
-    $series->setPlotStyle('marker');
+        $series = new \PhpOffice\PhpSpreadsheet\Chart\DataSeries(
+            \PhpOffice\PhpSpreadsheet\Chart\DataSeries::TYPE_SCATTERCHART,
+            null, [0], [$seriesLabel], [$xValues], [$yValues]
+        );
+        $series->setPlotStyle('marker');
 
-    $plotArea = new \PhpOffice\PhpSpreadsheet\Chart\PlotArea(null, [$series]);
-    $legend = new \PhpOffice\PhpSpreadsheet\Chart\Legend(\PhpOffice\PhpSpreadsheet\Chart\Legend::POSITION_RIGHT, null, false);
-    $title = new \PhpOffice\PhpSpreadsheet\Chart\Title('Importance vs Performance');
+        $plotArea = new \PhpOffice\PhpSpreadsheet\Chart\PlotArea(null, [$series]);
+        $legend = new \PhpOffice\PhpSpreadsheet\Chart\Legend(\PhpOffice\PhpSpreadsheet\Chart\Legend::POSITION_RIGHT, null, false);
+        $title = new \PhpOffice\PhpSpreadsheet\Chart\Title('Importance vs Performance');
 
-    $chart = new \PhpOffice\PhpSpreadsheet\Chart\Chart('kuadranChart', $title, $legend, $plotArea);
-    $chart->setTopLeftPosition('H4');
-    $chart->setBottomRightPosition('P25');
-    $sheet3->addChart($chart);
-} catch (\Throwable $e) {
+        $chart = new \PhpOffice\PhpSpreadsheet\Chart\Chart('kuadranChart', $title, $legend, $plotArea);
+        $chart->setTopLeftPosition('H4');
+        $chart->setBottomRightPosition('P25');
+        $sheet3->addChart($chart);
+    } catch (\Throwable $e) {
+        \Log::error('Export - Gagal bikin chart: ' . $e->getMessage());
+        // Lanjut tanpa chart, data tetap bisa didownload
+    }
+
     \Log::info('Export - Data processing selesai: ' . round(microtime(true) - $t0, 2) . 's');
+
     // ============================================================
     // 3. OUTPUT
     // ============================================================
@@ -891,10 +896,10 @@ $sheet1->setCellValue($cLetter . $row, $data['rata_rata']);
     $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
     $writer->setIncludeCharts(true);
 
-    return response()->streamDownload(function () use ($writer) {
+    return response()->streamDownload(function () use ($writer, $t0) {
         \Log::info('Export - Mulai writer save: ' . round(microtime(true) - $t0, 2) . 's');
         $writer->save('php://output');
-\Log::info('Export - Writer save selesai: ' . round(microtime(true) - $t0, 2) . 's');
+        \Log::info('Export - Writer save selesai: ' . round(microtime(true) - $t0, 2) . 's');
     }, $fileName, [
         'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     ]);
